@@ -73,9 +73,5 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             this.NuGet("push", argList.ToArray());
         }
-        protected override string ProcessRemoteCommand(string name, string[] args)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

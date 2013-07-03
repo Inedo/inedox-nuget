@@ -82,17 +82,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
             var argList = new List<string>();
             string projectPath;
 
-            using (var agent = (IFileOperationsExecuter)Util.Agents.CreateAgentFromId(this.ServerId))
-            {
-                if (this.ProjectPath.StartsWith("~\\"))
-                    projectPath = agent.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId, this.ProjectPath);
-                else
-                    projectPath = agent.CombinePath(this.RemoteConfiguration.SourceDirectory, this.ProjectPath);
-            }
+            var agent = this.Context.Agent.GetService<IFileOperationsExecuter>();
+            if (this.ProjectPath.StartsWith("~\\"))
+                projectPath = agent.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.ProjectPath);
+            else
+                projectPath = agent.CombinePath(this.Context.SourceDirectory, this.ProjectPath);
 
             argList.Add("\"" + projectPath + "\"");
-            argList.Add("-BasePath \"" + this.RemoteConfiguration.SourceDirectory + "\"");
-            argList.Add("-OutputDirectory \"" + this.RemoteConfiguration.TargetDirectory + "\"");
+            argList.Add("-BasePath \"" + this.Context.SourceDirectory + "\"");
+            argList.Add("-OutputDirectory \"" + this.Context.TargetDirectory + "\"");
 
             bool isNuspec = projectPath.EndsWith(".nuspec", StringComparison.OrdinalIgnoreCase);
 
@@ -108,10 +106,6 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 argList.Add("-Properties \"" + string.Join(";", this.Properties) + "\"");
 
             this.NuGet("pack", argList.ToArray());
-        }
-        protected override string ProcessRemoteCommand(string name, string[] args)
-        {
-            throw new NotImplementedException();
         }
     }
 }

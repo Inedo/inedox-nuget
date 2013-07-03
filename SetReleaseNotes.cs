@@ -100,7 +100,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 LogInformation("Querying issue tracker for release notes...");
 
                 var applicationRow = StoredProcs.Applications_GetApplication(this.Context.ApplicationId).ExecuteDataRow();
-                Issue[] issues = null;
+                IssueTrackerIssue[] issues = null;
                 IssueTrackingProviderBase issueProvider = null;
 
                 if (!Convert.IsDBNull((applicationRow[TableDefs.Applications_Extended.IssueTracking_Provider_Id])))
@@ -108,12 +108,11 @@ namespace Inedo.BuildMasterExtensions.NuGet
                     #region Create Provider
                     try
                     {
-                        issueProvider = (IssueTrackingProviderBase)
-                            Util.Providers.CreateProviderFromId(
+                        issueProvider = Util.Providers.CreateProviderFromId<IssueTrackingProviderBase>(
                                 (int)applicationRow[TableDefs.Applications_Extended.IssueTracking_Provider_Id]);
                         if (issueProvider is ICategoryFilterable)
                             ((ICategoryFilterable)issueProvider).CategoryIdFilter =
-                                Util.Persistence.DeSerializeToStringArray(
+                                Util.Persistence.DeserializeToStringArray(
                                     applicationRow[TableDefs.Applications_Extended.IssueTracking_CategoryIdList_Text]
                                     as string);
                         issues = issueProvider.GetIssues(this.Context.ReleaseNumber);
@@ -162,7 +161,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             if (args == null || args.Length < 1)
                 throw new ArgumentNullException("args");
 
-            var nuspecFile = Path.Combine(this.RemoteConfiguration.SourceDirectory, this.NuspecFileName);
+            var nuspecFile = Path.Combine(this.Context.SourceDirectory, this.NuspecFileName);
             if (!File.Exists(nuspecFile))
             {
                 LogError("Nuspec file '{0}' does not exist", nuspecFile);

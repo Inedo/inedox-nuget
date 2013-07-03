@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Web;
-using Inedo.Linq;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
@@ -17,9 +17,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
         "Set Nuspec Dependency Versions",
         "Sets versions required for specific dependencies in a .nuspec file.",
         "NuGet")]
-    [RequiresInterface(typeof(IFileOperationsExecuter))]
     [CustomEditor(typeof(SetDependencyVersionsActionEditor))]
-    public sealed class SetDependencyVersionsAction : RemoteActionBase
+    public sealed class SetDependencyVersionsAction : AgentBasedActionBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SetDependencyVersionsAction"/> class.
@@ -72,62 +71,60 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             int dependenciesWritten = 0;
 
-            using (var agent = (IFileOperationsExecuter)Util.Agents.CreateAgentFromId(this.ServerId))
+            var agent = this.Context.Agent.GetService<IFileOperationsExecuter>();
+            var nuspecFilePath = agent.CombinePath(this.Context.SourceDirectory, this.NuspecFile);
+
+            this.LogInformation("Reading {0}...", nuspecFilePath);
+            var nuspecStream = new MemoryStream(agent.ReadFileBytes(nuspecFilePath), true);
+            var xdoc = new XmlDocument();
+            xdoc.Load(nuspecStream);
+
+            var ns = xdoc.DocumentElement.NamespaceURI;
+            var nsManager = new XmlNamespaceManager(xdoc.NameTable);
+            nsManager.AddNamespace("n", ns);
+
+            var dependencyNodes = xdoc
+                .SelectNodes("//n:dependency", nsManager)
+                .Cast<XmlElement>()
+                .GroupBy(e => e.GetAttribute("id"))
+                .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+
+            var nodesToAdd = new List<XmlElement>();
+
+            foreach (var dependency in dependencies)
             {
-                var nuspecFilePath = agent.CombinePath(this.RemoteConfiguration.SourceDirectory, this.NuspecFile);
-
-                this.LogInformation("Reading {0}...", nuspecFilePath);
-                var nuspecStream = new MemoryStream(agent.ReadAllFileBytes(nuspecFilePath), true);
-                var xdoc = new XmlDocument();
-                xdoc.Load(nuspecStream);
-
-                var ns = xdoc.DocumentElement.NamespaceURI;
-                var nsManager = new XmlNamespaceManager(xdoc.NameTable);
-                nsManager.AddNamespace("n", ns);
-
-                var dependencyNodes = xdoc
-                    .SelectNodes("//n:dependency", nsManager)
-                    .Cast<XmlElement>()
-                    .GroupBy(e => e.GetAttribute("id"))
-                    .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
-
-                var nodesToAdd = new List<XmlElement>();
-
-                foreach (var dependency in dependencies)
+                List<XmlElement> elements;
+                if (dependencyNodes.TryGetValue(dependency.Id, out elements))
                 {
-                    List<XmlElement> elements;
-                    if (dependencyNodes.TryGetValue(dependency.Id, out elements))
-                    {
-                        this.LogDebug("Updating dependency {0}...", dependency.Id, dependency.Version);
-                        foreach (var element in elements)
-                            element.SetAttribute("version", dependency.Version);
-                    }
-                    else
-                    {
-                        this.LogDebug("Adding dependency {0}...", dependency.Id, dependency.Version);
-                        var element = xdoc.CreateElement("dependency", ns);
-                        element.SetAttribute("id", dependency.Id);
+                    this.LogDebug("Updating dependency {0}...", dependency.Id, dependency.Version);
+                    foreach (var element in elements)
                         element.SetAttribute("version", dependency.Version);
-                        nodesToAdd.Add(element);
-                    }
-
-                    dependenciesWritten++;
+                }
+                else
+                {
+                    this.LogDebug("Adding dependency {0}...", dependency.Id, dependency.Version);
+                    var element = xdoc.CreateElement("dependency", ns);
+                    element.SetAttribute("id", dependency.Id);
+                    element.SetAttribute("version", dependency.Version);
+                    nodesToAdd.Add(element);
                 }
 
-                var targetElement = (XmlElement)xdoc.SelectSingleNode("//n:dependencies", nsManager);
-                foreach (var node in nodesToAdd)
-                    targetElement.AppendChild(node);
-
-                nuspecStream = new MemoryStream();
-                xdoc.Save(nuspecStream);
-
-                var fileAttributes = agent.GetFileEntry(nuspecFilePath);
-                if ((fileAttributes.Attributes & FileAttributes.ReadOnly) != 0)
-                    agent.WriteFile(nuspecFilePath, null, fileAttributes.Attributes & ~FileAttributes.ReadOnly, null, false);
-
-                this.LogInformation("Writing updated .nuspec file to {0}...", nuspecFilePath);
-                agent.WriteFile(nuspecFilePath, null, null, nuspecStream.ToArray(), false);
+                dependenciesWritten++;
             }
+
+            var targetElement = (XmlElement)xdoc.SelectSingleNode("//n:dependencies", nsManager);
+            foreach (var node in nodesToAdd)
+                targetElement.AppendChild(node);
+
+            nuspecStream = new MemoryStream();
+            xdoc.Save(nuspecStream);
+
+            var fileAttributes = agent.GetFileEntry(nuspecFilePath);
+            if ((fileAttributes.Attributes & FileAttributes.ReadOnly) != 0)
+                agent.SetAttributes(nuspecFilePath, null, fileAttributes.Attributes & ~FileAttributes.ReadOnly);
+
+            this.LogInformation("Writing updated .nuspec file to {0}...", nuspecFilePath);
+            agent.WriteFileBytes(nuspecFilePath, nuspecStream.ToArray());
 
             this.LogInformation("Wrote {0} dependencies", dependenciesWritten);
         }

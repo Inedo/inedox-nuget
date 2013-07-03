@@ -9,7 +9,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// <summary>
     /// Provides common NuGet action functionality.
     /// </summary>
-    public abstract class NuGetActionBase : CommandLineActionBase
+    public abstract class NuGetActionBase : AgentBasedActionBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NuGetActionBase"/> class.
@@ -20,35 +20,21 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected int NuGet(string command, params string[] args)
         {
-            using (var agent = (IRemoteProcessExecuter)Util.Agents.CreateAgentFromId(this.ServerId))
-            {
-                return this.NuGet(agent, command, args);
-            }
-        }
-        protected int NuGet(IRemoteProcessExecuter agent, string command, params string[] args)
-        {
-            return this.NuGetInternal(agent, "nuget.exe", command, args);
+            return this.NuGetInternal("nuget.exe", command, args);
         }
         protected int ProGet(string command, params string[] args)
         {
-            using (var agent = (IRemoteProcessExecuter)Util.Agents.CreateAgentFromId(this.ServerId))
-            {
-                return this.ProGet(agent, command, args);
-            }
-        }
-        protected int ProGet(IRemoteProcessExecuter agent, string command, params string[] args)
-        {
-            return this.NuGetInternal(agent, "proget.exe", command, args);
+            return this.NuGetInternal("proget.exe", command, args);
         }
 
-        private int NuGetInternal(IRemoteProcessExecuter agent, string fileName, string command, string[] args)
+        private int NuGetInternal(string fileName, string command, string[] args)
         {
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
             if (args == null)
                 throw new ArgumentNullException("args");
 
-            var fileOps = (IFileOperationsExecuter)agent;
+            var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
             var baseWorkingDirectory = fileOps.GetBaseWorkingDirectory();
 
             var nugetPath = Path.Combine(baseWorkingDirectory, @"ExtTemp\NuGet\" + fileName);
@@ -61,10 +47,10 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 );
 
                 var bytes = File.ReadAllBytes(path);
-                fileOps.WriteFile(nugetPath, null, null, bytes, true);
+                fileOps.WriteFileBytes(nugetPath, bytes);
             }
 
-            return this.ExecuteCommandLine(agent, nugetPath, command + " " + string.Join(" ", args), this.RemoteConfiguration.SourceDirectory);
+            return this.ExecuteCommandLine(nugetPath, command + " " + string.Join(" ", args), this.Context.SourceDirectory);
         }
     }
 }

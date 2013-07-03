@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Xml;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
@@ -17,7 +16,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         "NuGet")]
     [CustomEditor(typeof(GenerateNuspecActionEditor))]
     [RequiresInterface(typeof(IFileOperationsExecuter))]
-    public sealed class GenerateNuspecAction : RemoteActionBase
+    public sealed class GenerateNuspecAction : AgentBasedActionBase
     {
         private const string NuspecSchema = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
 
@@ -157,16 +156,10 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 writer.WriteEndElement(); //package
             }
 
-            using (var fileOps = (IFileOperationsExecuter)Util.Agents.CreateAgentFromId(this.ServerId))
-            {
-                var fileName = fileOps.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId, this.OutputFileName);
-                this.LogInformation("Writing {0}...", fileName);
-                fileOps.WriteFile(fileName, null, null, buffer.ToArray(), true);
-            }
-        }
-        protected override string ProcessRemoteCommand(string name, string[] args)
-        {
-            throw new NotImplementedException();
+            var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
+            var fileName = fileOps.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.OutputFileName);
+            this.LogInformation("Writing {0}...", fileName);
+            fileOps.WriteFileBytes(fileName,buffer.ToArray());
         }
     }
 }
