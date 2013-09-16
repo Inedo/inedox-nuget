@@ -15,8 +15,6 @@ namespace Inedo.BuildMasterExtensions.NuGet
         "Creates a package using NuGet.",
         "NuGet")]
     [CustomEditor(typeof(CreatePackageActionEditor))]
-    [RequiresInterface(typeof(IRemoteProcessExecuter))]
-    [RequiresInterface(typeof(IFileOperationsExecuter))]
     public sealed class CreatePackage : NuGetActionBase
     {
         /// <summary>
