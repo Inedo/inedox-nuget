@@ -12,8 +12,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// </summary>
     [ActionProperties(
         "Generate .nuspec File",
-        "Writes a new NuGet .nuspec file suitable for use in creating a package.",
-        "NuGet")]
+        "Writes a new NuGet .nuspec file suitable for use in creating a package.")]
     [CustomEditor(typeof(GenerateNuspecActionEditor))]
     public sealed class GenerateNuspecAction : AgentBasedActionBase
     {

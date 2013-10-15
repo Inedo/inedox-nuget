@@ -28,7 +28,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                     var applicationRow = StoredProcs.Applications_GetApplication(this.ApplicationId).ExecuteDataRow();
                     if (Convert.IsDBNull(applicationRow[TableDefs.Applications_Extended.IssueTracking_Provider_Id]))
                     {
-                        e.ValidLevel = ValidationLevels.Warning;
+                        e.ValidLevel = ValidationLevel.Warning;
                         e.Message = "The application does not currently have an issue tracker configured. To ignore this warning and continue, click Save again.";
                     }
                 }

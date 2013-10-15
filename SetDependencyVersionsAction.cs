@@ -13,10 +13,10 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// <summary>
     /// Writes dependency version information to a .nuspec file.
     /// </summary>
+    [Tag("nuget")]
     [ActionProperties(
         "Set Nuspec Dependency Versions",
-        "Sets versions required for specific dependencies in a .nuspec file.",
-        "NuGet")]
+        "Sets versions required for specific dependencies in a .nuspec file.")]
     [CustomEditor(typeof(SetDependencyVersionsActionEditor))]
     public sealed class SetDependencyVersionsAction : AgentBasedActionBase
     {

@@ -174,7 +174,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             {
                 if (!property.Contains("="))
                 {
-                    e.ValidLevel = ValidationLevels.Error;
+                    e.ValidLevel = ValidationLevel.Error;
                     e.Message = "Properties must be in the form PROPERTY=VALUE.";
                     return;
                 }
@@ -184,7 +184,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             {
                 if (string.IsNullOrEmpty(this.txtNuspecPath.Text))
                 {
-                    e.ValidLevel = ValidationLevels.Error;
+                    e.ValidLevel = ValidationLevel.Error;
                     e.Message = ".nuspec file path is required.";
                     return;
                 }
@@ -193,7 +193,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             {
                 if (string.IsNullOrEmpty(this.txtProjectPath.Text))
                 {
-                    e.ValidLevel = ValidationLevels.Error;
+                    e.ValidLevel = ValidationLevel.Error;
                     e.Message = "MSBuild project file path is required.";
                     return;
                 }

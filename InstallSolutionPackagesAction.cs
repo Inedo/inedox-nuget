@@ -14,8 +14,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// </summary>
     [ActionProperties(
         "Install NuGet Packages",
-        "Installs all packages required for projects in a solution to build.",
-        "NuGet")]
+        "Installs all packages required for projects in a solution to build.")]
     [CustomEditor(typeof(InstallSolutionPackagesActionEditor))]
     public sealed class InstallSolutionPackagesAction : NuGetActionBase
     {

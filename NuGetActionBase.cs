@@ -9,6 +9,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// <summary>
     /// Provides common NuGet action functionality.
     /// </summary>
+    [Tag("nuget")]
     public abstract class NuGetActionBase : AgentBasedActionBase
     {
         /// <summary>

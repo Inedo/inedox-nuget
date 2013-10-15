@@ -12,8 +12,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// </summary>
     [ActionProperties(
         "Create NuGet Package",
-        "Creates a package using NuGet.",
-        "NuGet")]
+        "Creates a package using NuGet.")]
     [CustomEditor(typeof(CreatePackageActionEditor))]
     public sealed class CreatePackage : NuGetActionBase
     {

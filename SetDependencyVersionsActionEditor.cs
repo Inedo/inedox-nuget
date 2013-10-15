@@ -114,7 +114,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         {
             if (TryParseDependencies(this.txtVersions.Text) == null)
             {
-                e.ValidLevel = ValidationLevels.Error;
+                e.ValidLevel = ValidationLevel.Error;
                 e.Message = "Invalid dependency version format.";
                 return;
             }
