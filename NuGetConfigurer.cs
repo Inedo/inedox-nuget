@@ -29,6 +29,11 @@ namespace Inedo.BuildMasterExtensions.NuGet
         /// </summary>
         [Persistent]
         public bool UseProGetClient { get; set; }
+        /// <summary>
+        /// Gets or sets the path to the NuGet.exe to use.
+        /// </summary>
+        [Persistent]
+        public string NuGetExe { get; set; }
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this instance.

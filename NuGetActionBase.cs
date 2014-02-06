@@ -35,20 +35,29 @@ namespace Inedo.BuildMasterExtensions.NuGet
             if (args == null)
                 throw new ArgumentNullException("args");
 
-            var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
-            var baseWorkingDirectory = fileOps.GetBaseWorkingDirectory();
-
-            var nugetPath = Path.Combine(baseWorkingDirectory, @"ExtTemp\NuGet\" + fileName);
-            var fileInfo = fileOps.GetFileEntry(nugetPath);
-            if (fileInfo == null)
+            string nugetPath;
+            var configurer = (NuGetConfigurer)this.GetExtensionConfigurer();
+            if (string.IsNullOrEmpty(configurer.NuGetExe))
             {
-                var path = Path.Combine(
-                    Path.GetDirectoryName(typeof(NuGetActionBase).Assembly.Location),
-                    fileName
-                );
+                var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
+                var baseWorkingDirectory = fileOps.GetBaseWorkingDirectory();
 
-                var bytes = File.ReadAllBytes(path);
-                fileOps.WriteFileBytes(nugetPath, bytes);
+                nugetPath = Path.Combine(baseWorkingDirectory, @"ExtTemp\NuGet\" + fileName);
+                var fileInfo = fileOps.GetFileEntry(nugetPath);
+                if (fileInfo == null)
+                {
+                    var path = Path.Combine(
+                        Path.GetDirectoryName(typeof(NuGetActionBase).Assembly.Location),
+                        fileName
+                    );
+
+                    var bytes = File.ReadAllBytes(path);
+                    fileOps.WriteFileBytes(nugetPath, bytes);
+                }
+            }
+            else
+            {
+                nugetPath = configurer.NuGetExe;
             }
 
             return this.ExecuteCommandLine(nugetPath, command + " " + string.Join(" ", args), this.Context.SourceDirectory);

@@ -9,14 +9,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
     internal sealed class NuGetConfigurerEditor : ExtensionConfigurerEditorBase
     {
         private ValidatingTextBox txtPackageSource;
+        private ValidatingTextBox txtNuGetExe;
         private CheckBox chkUseProGet;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NuGetConfigurerEditor"/> class.
-        /// </summary>
-        public NuGetConfigurerEditor()
-        {
-        }
 
         public override void InitializeDefaultValues()
         {
@@ -28,6 +22,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             var configurer = (NuGetConfigurer)extension;
             this.txtPackageSource.Text = configurer.PackageSource;
+            this.txtNuGetExe.Text = configurer.NuGetExe;
             this.chkUseProGet.Checked = configurer.UseProGetClient;
         }
         public override ExtensionConfigurerBase CreateFromForm()
@@ -37,6 +32,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             return new NuGetConfigurer
             {
                 PackageSource = this.txtPackageSource.Text,
+                NuGetExe = this.txtNuGetExe.Text,
                 UseProGetClient = this.chkUseProGet.Checked
             };
         }
@@ -49,6 +45,13 @@ namespace Inedo.BuildMasterExtensions.NuGet
             {
                 Required = false,
                 DefaultText = "default",
+                Width = 300
+            };
+
+            this.txtNuGetExe = new ValidatingTextBox
+            {
+                Required = false,
+                DefaultText = "use embedded nuget.exe",
                 Width = 300
             };
 
@@ -65,6 +68,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
                     new StandardFormField(
                         "Package Source:",
                         this.txtPackageSource
+                    )
+                ),
+                new FormFieldGroup(
+                    "NuGet Client",
+                    "Specify the full path to a nuget.exe to use instead of the embedded NuGet client. If this is blank, the NuGet client included with the extension is used instead.",
+                    false,
+                    new StandardFormField(
+                        "Path to NuGet.exe:",
+                        this.txtNuGetExe
                     )
                 ),
                 new FormFieldGroup(
