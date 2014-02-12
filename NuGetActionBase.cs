@@ -37,7 +37,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             string nugetPath;
             var configurer = (NuGetConfigurer)this.GetExtensionConfigurer();
-            if (string.IsNullOrEmpty(configurer.NuGetExe))
+            if (string.IsNullOrEmpty(configurer.NuGetExe) || fileName.Contains("proget.exe"))
             {
                 var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
                 var baseWorkingDirectory = fileOps.GetBaseWorkingDirectory();
