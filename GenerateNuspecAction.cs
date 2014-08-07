@@ -10,6 +10,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// <summary>
     /// Generates a .nuspec file.
     /// </summary>
+    [Tag("nuget")]
     [ActionProperties(
         "Generate .nuspec File",
         "Writes a new NuGet .nuspec file suitable for use in creating a package.")]
@@ -23,7 +24,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         /// </summary>
         public GenerateNuspecAction()
         {
-            this.Version = "%RELNO%";
+            this.Version = "$ReleaseNumber";
         }
 
         [Persistent]
@@ -60,19 +61,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
         [Persistent]
         public string Tags { get; set; }
 
-        /// <summary>
-        /// Returns a <see cref="System.String"/> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String"/> that represents this instance.
-        /// </returns>
-        public override string ToString()
+        public override ActionDescription GetActionDescription()
         {
-            return string.Format(
-                "Generate {0} for package {1} (version {2})",
-                this.OutputFileName,
-                this.Id,
-                this.Version
+            return new ActionDescription(
+                new ShortActionDescription(
+                    "Generate ",
+                    new Hilite(this.OutputFileName),
+                    " for ",
+                    new Hilite(this.Id + "." + this.Version)
+                )
             );
         }
 

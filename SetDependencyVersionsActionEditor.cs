@@ -22,16 +22,12 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         public override void BindToForm(ActionBase extension)
         {
-            this.EnsureChildControls();
-
             var action = (SetDependencyVersionsAction)extension;
             this.txtNuspecFile.Text = string.IsNullOrEmpty(action.OverriddenSourceDirectory) ? action.NuspecFile : Util.Path2.Combine(action.OverriddenSourceDirectory, action.NuspecFile);
             this.txtVersions.Text = string.Join(Environment.NewLine, action.DependencyVersions ?? new string[0]);
         }
         public override ActionBase CreateFromForm()
         {
-            this.EnsureChildControls();
-
             return new SetDependencyVersionsAction
             {
                 OverriddenSourceDirectory = Util.NullIf(Util.Path2.GetDirectoryName(this.txtNuspecFile.Text), string.Empty),
@@ -53,29 +49,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
             {
                 TextMode = TextBoxMode.MultiLine,
                 Required = true,
-                Rows = 3,
-                Width = 300
+                Rows = 3
             };
 
             this.Controls.Add(
-                new FormFieldGroup(
-                    "Nuspec File",
-                    "Provide the path to the .nuspec file to update. If the path is relative, the default source directory is used.",
-                    false,
-                    new StandardFormField(
-                        "Nuspec File:",
-                        this.txtNuspecFile
-                    )
-                ),
-                new FormFieldGroup(
-                    "Dependencies",
-                    "Provide a list of dependency versions to write to the .nuspec file in the format <i>Id=Version</i> (one per line). For example:<br/><i>jQuery=[1.9.1]<br/>Internal.Library=[%RELNO%.%BLDNO%]</i>",
-                    true,
-                    new StandardFormField(
-                        "Dependency Versions:",
-                        this.txtVersions
-                    )
-                )
+                new SlimFormField("Nuspec file:", this.txtNuspecFile),
+                new SlimFormField("Dependencies:", this.txtVersions)
+                {
+                    HelpText = HelpText.FromHtml("Provide a list of dependency versions to write to the .nuspec file in the format <i>Id=Version</i> (one per line). For example:<br/><i>jQuery=[1.9.1]<br/>Internal.Library=[%RELNO%.%BLDNO%]</i>")
+                }
             );
         }
 

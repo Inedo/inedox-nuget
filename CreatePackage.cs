@@ -10,6 +10,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     /// <summary>
     /// Creates a NuGet package.
     /// </summary>
+    [Tag("nuget")]
     [ActionProperties(
         "Create NuGet Package",
         "Creates a package using NuGet.")]
@@ -60,18 +61,18 @@ namespace Inedo.BuildMasterExtensions.NuGet
         [Persistent]
         public string[] Properties { get; set; }
 
-        /// <summary>
-        /// Returns a <see cref="System.String"/> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String"/> that represents this instance.
-        /// </returns>
-        public override string ToString()
+        public override ActionDescription GetActionDescription()
         {
-            return string.Format(
-                "Create a NuGet package from {0} in {1}",
-                this.ProjectPath,
-                Util.CoalesceStr(this.OverriddenTargetDirectory, "default target directory"));
+            return new ActionDescription(
+                new ShortActionDescription(
+                    "Create NuGet package from ",
+                    new DirectoryHilite(this.OverriddenSourceDirectory, this.ProjectPath)
+                ),
+                new LongActionDescription(
+                    "in ",
+                    new DirectoryHilite(this.OverriddenTargetDirectory)
+                )
+            );
         }
 
         protected override void Execute()

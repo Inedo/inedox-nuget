@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.UI.WebControls;
+using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
@@ -7,48 +8,40 @@ using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
-    /// <summary>
-    /// Custom editor for the Create Package action.
-    /// </summary>
-    public sealed class CreatePackageActionEditor : ActionEditorBase
+    internal sealed class CreatePackageActionEditor : ActionEditorBase
     {
         private DropDownList ddlSourceType;
         private SourceControlFileFolderPicker txtProjectPath;
-        private TextBox txtVersion;
+        private ValidatingTextBox txtVersion;
         private CheckBox chkSymbols;
-        private TextBox txtProperties;
+        private ValidatingTextBox txtProperties;
         private SourceControlFileFolderPicker txtNuspecPath;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CreatePackageActionEditor"/> class.
-        /// </summary>
         public CreatePackageActionEditor()
         {
             this.ValidateBeforeSave += this.CreatePackageActionEditor_ValidateBeforeSave;
         }
 
-        public override bool DisplaySourceDirectory
-        {
-            get { return true; }
-        }
         public override bool DisplayTargetDirectory
         {
             get { return true; }
         }
+        public override string TargetDirectoryLabel
+        {
+            get { return "In:"; }
+        }
 
         public override void BindToForm(ActionBase extension)
         {
-            this.EnsureChildControls();
-
             var action = (CreatePackage)extension;
             if (action.ProjectPath == null || action.ProjectPath.EndsWith(".nuspec", StringComparison.OrdinalIgnoreCase))
             {
-                this.txtNuspecPath.Text = action.ProjectPath;
+                this.txtNuspecPath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
                 this.ddlSourceType.SelectedValue = "nuspec";
             }
             else
             {
-                this.txtProjectPath.Text = action.ProjectPath;
+                this.txtProjectPath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
                 this.ddlSourceType.SelectedValue = "msbuild";
             }
 
@@ -59,11 +52,12 @@ namespace Inedo.BuildMasterExtensions.NuGet
         }
         public override ActionBase CreateFromForm()
         {
-            this.EnsureChildControls();
+            var path = this.ddlSourceType.SelectedValue == "nuspec" ? this.txtNuspecPath.Text : this.txtProjectPath.Text;
 
             return new CreatePackage
             {
-                ProjectPath = this.ddlSourceType.SelectedValue == "nuspec" ? this.txtNuspecPath.Text : this.txtProjectPath.Text,
+                OverriddenSourceDirectory = Util.Path2.GetDirectoryName(path),
+                ProjectPath = Util.Path2.GetFileName(path),
                 Version = this.txtVersion.Text,
                 Symbols = this.chkSymbols.Checked,
                 Build = true,
@@ -73,8 +67,6 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected override void CreateChildControls()
         {
-            base.CreateChildControls();
-
             this.ddlSourceType = new DropDownList { ID = "ddlSourceType" };
             this.ddlSourceType.Items.Add(new ListItem(".nuspec file", "nuspec"));
             this.ddlSourceType.Items.Add(new ListItem("msbuild project", "msbuild"));
@@ -91,61 +83,33 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 ServerId = this.ServerId
             };
 
-            this.txtVersion = new ValidatingTextBox { Width = 300, DefaultText = "default" };
+            this.txtVersion = new ValidatingTextBox { DefaultText = "default (nuspec or project version)" };
 
-            this.txtProperties = new TextBox
+            this.txtProperties = new ValidatingTextBox
             {
-                Width = 300,
                 Rows = 5,
-                TextMode = TextBoxMode.MultiLine
+                TextMode = TextBoxMode.MultiLine,
+                DefaultText = "none"
             };
 
-            this.chkSymbols = new CheckBox { Text = "Create Symbol Package" };
+            this.chkSymbols = new CheckBox { Text = "Create symbol package" };
 
-            var ctlNuspecFileField = new StandardFormField(".nuspec File:", this.txtNuspecPath) { ID = "ctlNuspecFileField" };
-            var ctlProjectFileField = new StandardFormField("MSBuild Project:", this.txtProjectPath) { ID = "ctlProjectFileField" };
+            var ctlNuspecFileField = new SlimFormField(".nuspec file:", this.txtNuspecPath) { ID = "ctlNuspecFileField" };
+            var ctlProjectFileField = new SlimFormField("MSBuild project:", this.txtProjectPath) { ID = "ctlProjectFileField" };
 
-            var ffgProperties = new FormFieldGroup(
-                "Properties",
-                "Provide additional properties to pass to NuGet. Use the format Property=Value (one per line). For example:<br/><i>Configuration=Release</i>",
-                false,
-                new StandardFormField(
-                    "Properties:",
-                    this.txtProperties
-                )
-            ) { ID = "ffgProperties" };
+            var ffgProperties = new SlimFormField("Properties:", this.txtProperties)
+            {
+                ID = "ffgProperties",
+                HelpText = HelpText.FromHtml("Provide additional properties to pass to NuGet. Use the format Property=Value (one per line). For example:<br/><i>Configuration=Release</i>")
+            };
 
             this.Controls.Add(
-                new FormFieldGroup(
-                    "Source Files",
-                    "Provide the file which will be used to create the NuGet package.",
-                    false,
-                    new StandardFormField(
-                        "Source:",
-                        this.ddlSourceType
-                    ),
-                    ctlNuspecFileField,
-                    ctlProjectFileField
-                ),
-                new FormFieldGroup(
-                    "Version",
-                    "Specify a version for the NuGet package. If not specified, the version in the nuspec file will be used.",
-                    false,
-                    new StandardFormField(
-                        "Package Version:",
-                        this.txtVersion
-                    )
-                ),
+                new SlimFormField("Source:", this.ddlSourceType),
+                ctlNuspecFileField,
+                ctlProjectFileField,
+                new SlimFormField("Package version:", this.txtVersion),
                 ffgProperties,
-                new FormFieldGroup(
-                    "Options",
-                    "Additional options for controlling package creation.",
-                    true,
-                    new StandardFormField(
-                        string.Empty,
-                        this.chkSymbols
-                    )
-                ),
+                new SlimFormField("Options:", this.chkSymbols),
                 new RenderJQueryDocReadyDelegator(
                     w =>
                     {

@@ -9,49 +9,30 @@ using Inedo.BuildMaster.Web;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
-    /// <summary>
-    /// Installs NuGet packages for a solution.
-    /// </summary>
+    [Tag("nuget")]
     [ActionProperties(
         "Install NuGet Packages",
         "Installs all packages required for projects in a solution to build.")]
     [CustomEditor(typeof(InstallSolutionPackagesActionEditor))]
     public sealed class InstallSolutionPackagesAction : NuGetActionBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InstallSolutionPackagesAction"/> class.
-        /// </summary>
-        public InstallSolutionPackagesAction()
-        {
-        }
-
-        /// <summary>
-        /// Gets or sets the directory to install packages to.
-        /// </summary>
-        /// <remarks>
-        /// This may be relative to the source directory.
-        /// </remarks>
         [Persistent]
         public string PackageOutputDirectory { get; set; }
 
-        /// <summary>
-        /// Returns a <see cref="System.String"/> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String"/> that represents this instance.
-        /// </returns>
-        public override string ToString()
+        public override ActionDescription GetActionDescription()
         {
-            return string.Format(
-                "Install NuGet packages to {0} for projects in {1}",
-                Util.CoalesceStr(this.PackageOutputDirectory, "(default)"),
-                Util.CoalesceStr(this.OverriddenSourceDirectory, "(default source directory)")
+            return new ActionDescription(
+                new ShortActionDescription(
+                    "Install NuGet packages to ",
+                    new DirectoryHilite(this.OverriddenSourceDirectory, Util.CoalesceStr(this.PackageOutputDirectory, "packages"))
+                ),
+                new LongActionDescription(
+                    "for projects in ",
+                    new DirectoryHilite(this.OverriddenSourceDirectory)
+                )
             );
         }
 
-        /// <summary>
-        /// This method is called to execute the Action.
-        /// </summary>
         protected override void Execute()
         {
             var agent = this.Context.Agent.GetService<IFileOperationsExecuter>();

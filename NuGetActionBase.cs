@@ -6,15 +6,9 @@ using Inedo.BuildMaster.Extensibility.Agents;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
-    /// <summary>
-    /// Provides common NuGet action functionality.
-    /// </summary>
     [Tag("nuget")]
     public abstract class NuGetActionBase : AgentBasedActionBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NuGetActionBase"/> class.
-        /// </summary>
         protected NuGetActionBase()
         {
         }

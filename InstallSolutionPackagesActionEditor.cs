@@ -1,6 +1,7 @@
 ﻿using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
+using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
@@ -8,29 +9,22 @@ namespace Inedo.BuildMasterExtensions.NuGet
     {
         private SourceControlFileFolderPicker txtInstallPath;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InstallSolutionPackagesActionEditor"/> class.
-        /// </summary>
-        public InstallSolutionPackagesActionEditor()
-        {
-        }
-
         public override bool DisplaySourceDirectory
         {
             get { return true; }
         }
+        public override string SourceDirectoryLabel
+        {
+            get { return "For projects in:"; }
+        }
 
         public override void BindToForm(ActionBase extension)
         {
-            this.EnsureChildControls();
-
             var action = (InstallSolutionPackagesAction)extension;
             this.txtInstallPath.Text = action.PackageOutputDirectory;
         }
         public override ActionBase CreateFromForm()
         {
-            this.EnsureChildControls();
-
             return new InstallSolutionPackagesAction
             {
                 PackageOutputDirectory = this.txtInstallPath.Text
@@ -42,20 +36,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
             this.txtInstallPath = new SourceControlFileFolderPicker
             {
                 ServerId = this.ServerId,
-                DefaultText = "default",
+                DefaultText = "$CurrentDirectory\\packages",
                 DisplayMode = SourceControlBrowser.DisplayModes.Folders
             };
 
             this.Controls.Add(
-                new FormFieldGroup(
-                    "Package Install Path",
-                    "By default, packages will be installed to the <i>packages</i> folder at the solution level. If you have multiple solutions in the specified path or need to override this behavior, you may set the path explicitly here.",
-                    true,
-                    new StandardFormField(
-                        "Package Install Path:",
-                        this.txtInstallPath
-                    )
-                )
+                new SlimFormField("To:", this.txtInstallPath)
+                {
+                    HelpText = HelpText.FromHtml("By default, packages will be installed to the <i>packages</i> folder at the solution level. If you have multiple solutions in the specified path or need to override this behavior, you may set the path explicitly here.")
+                }
             );
         }
     }

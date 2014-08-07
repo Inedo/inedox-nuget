@@ -1,48 +1,29 @@
-﻿using System.Web.UI.WebControls;
+﻿using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
-using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
 using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
-    /// <summary>
-    /// Custom editor for the publish package action.
-    /// </summary>
-    public sealed class PushPackageActionEditor : ActionEditorBase
+    internal sealed class PushPackageActionEditor : ActionEditorBase
     {
         private ValidatingTextBox txtPackagePath;
-        private TextBox txtApiKey;
-        private TextBox txtServerUrl;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PushPackageActionEditor"/> class.
-        /// </summary>
-        public PushPackageActionEditor()
-        {
-        }
-
-        public override bool DisplaySourceDirectory
-        {
-            get { return true; }
-        }
+        private ValidatingTextBox txtApiKey;
+        private ValidatingTextBox txtServerUrl;
 
         public override void BindToForm(ActionBase extension)
         {
-            EnsureChildControls();
-
             var action = (PushPackage)extension;
-            this.txtPackagePath.Text = action.PackagePath ?? string.Empty;
-            this.txtApiKey.Text = action.ApiKey ?? string.Empty;
-            this.txtServerUrl.Text = action.ServerUrl ?? string.Empty;
+            this.txtPackagePath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.PackagePath);
+            this.txtApiKey.Text = action.ApiKey;
+            this.txtServerUrl.Text = action.ServerUrl;
         }
         public override ActionBase CreateFromForm()
         {
-            EnsureChildControls();
-
             return new PushPackage
             {
-                PackagePath = this.txtPackagePath.Text,
+                OverriddenSourceDirectory = Util.Path2.GetDirectoryName(this.txtPackagePath.Text),
+                PackagePath = Util.Path2.GetFileName(this.txtPackagePath.Text),
                 ApiKey = this.txtApiKey.Text,
                 ServerUrl = this.txtServerUrl.Text
             };
@@ -50,45 +31,25 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected override void CreateChildControls()
         {
-            base.CreateChildControls();
-
             this.txtPackagePath = new ValidatingTextBox
             {
-                Width = 300,
                 Required = true
             };
 
-            this.txtApiKey = new TextBox
+            this.txtApiKey = new ValidatingTextBox
             {
-                Width = 300,
                 MaxLength = 200
             };
 
-            this.txtServerUrl = new TextBox { Width = 300 };
+            this.txtServerUrl = new ValidatingTextBox
+            {
+                DefaultText = "default"
+            };
 
-            CUtil.Add(this,
-                new FormFieldGroup(
-                    "Package",
-                    "Package to publish using NuGet. If a relative path is used, it is relative to the source directory.",
-                    false,
-                    new StandardFormField(
-                        "NuGet Package:",
-                        this.txtPackagePath
-                    )
-                ),
-                new FormFieldGroup(
-                    "Server Configuration",
-                    "The API Key and server URL used to publish the package.",
-                    true,
-                    new StandardFormField(
-                        "API Key:",
-                        this.txtApiKey
-                    ),
-                    new StandardFormField(
-                        "Server URL:",
-                        this.txtServerUrl
-                    )
-                )
+            this.Controls.Add(
+                new SlimFormField("NuGet package:", this.txtPackagePath),
+                new SlimFormField("API key:", this.txtApiKey),
+                new SlimFormField("Server URL:", this.txtServerUrl)
             );
         }
     }
