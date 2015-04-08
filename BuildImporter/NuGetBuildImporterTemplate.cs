@@ -18,6 +18,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
         public bool IncludePrerelease { get; set; }
         [Persistent]
         public bool VersionLocked { get; set; }
+        [Persistent]
+        public string AdditionalArguments { get; set; }
 
         public override ExtensionComponentDescription GetDescription()
         {

@@ -11,6 +11,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
         private ValidatingTextBox txtPackageId;
         private ValidatingTextBox txtPackageVersion;
         private ValidatingTextBox txtPackageSource;
+        private ValidatingTextBox txtAdditionalArguments;
         private CheckBox chkIncludePrerelease;
         private CheckBox chkVersionUnlocked;
 
@@ -41,6 +42,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
             this.txtPackageId = new ValidatingTextBox { Required = true };
             this.txtPackageVersion = new ValidatingTextBox { DefaultText = "latest" };
             this.txtPackageSource = new ValidatingTextBox { DefaultText = "default" };
+            this.txtAdditionalArguments = new ValidatingTextBox { DefaultText = "none" };
             this.chkIncludePrerelease = new CheckBox { Text = "Include prerelease versions" };
             this.chkVersionUnlocked = new CheckBox { Text = "Allow version selection at build time" };
 
@@ -52,7 +54,11 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                     new Div(this.chkIncludePrerelease),
                     new Div(this.chkVersionUnlocked)
                 ),
-                new SlimFormField("Package source:", this.txtPackageSource)
+                new SlimFormField("Package source:", this.txtPackageSource),
+                new SlimFormField("Additional arguments:", this.txtAdditionalArguments)
+                {
+                    HelpText = "Optionally supply any additional arguments that will be passed to NuGet.exe when the package is installed."
+                }
             );
         }
     }

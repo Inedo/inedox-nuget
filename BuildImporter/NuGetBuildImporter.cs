@@ -26,6 +26,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
         public string PackageSource { get; set; }
         [Persistent]
         public bool IncludePrerelease { get; set; }
+        [Persistent]
+        public string AdditionalArguments { get; set; }
 
         public override void Import(IBuildImporterContext context)
         {
@@ -36,7 +38,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
 
             var packageSource = Util.CoalesceStr(this.PackageSource, configurer != null ? configurer.PackageSource : null);
 
-            var args = "install \"" + this.PackageId + "\" -ExcludeVersion";
+            var args = "install \"" + this.PackageId + "\" -ExcludeVersion -NoCache";
             if (!string.IsNullOrEmpty(this.PackageVersion))
                 args += " -Version \"" + this.PackageVersion + "\"";
             if (this.IncludePrerelease)
@@ -50,6 +52,9 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 Directory.CreateDirectory(tempPath);
 
                 args += " -OutputDirectory \"" + tempPath + "\"";
+
+                if (!string.IsNullOrWhiteSpace(this.AdditionalArguments))
+                    args += " " + this.AdditionalArguments;
 
                 this.LogDebug("Executing {0} {1}", nugetExe, args);
                 this.LogInformation("Executing NuGet...");
