@@ -63,7 +63,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 Checked = true
             };
 
-            this.chkIncludeVersionInArtifactName = new CheckBox { Text = "Include package version in build artifact name" }
+            this.chkIncludeVersionInArtifactName = new CheckBox { Text = "Include package version in build artifact name" };
 
             this.Controls.Add(
                 new SlimFormField("Package ID:", this.txtPackageId),
