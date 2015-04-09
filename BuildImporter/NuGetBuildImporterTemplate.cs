@@ -20,6 +20,12 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
         public bool VersionLocked { get; set; }
         [Persistent]
         public string AdditionalArguments { get; set; }
+        [Persistent]
+        public bool CaptureIdAndVersion { get; set; }
+        [Persistent]
+        public string PackageArtifactRoot { get; set; }
+        [Persistent]
+        public bool IncludeVersionInArtifactName { get; set; }
 
         public override ExtensionComponentDescription GetDescription()
         {
@@ -35,6 +41,9 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 " from ",
                 new Hilite(!string.IsNullOrEmpty(this.PackageSource) ? this.PackageSource : "default package source")
             );
+
+            if (this.CaptureIdAndVersion)
+                description.AppendContent(" and set $ImportedPackageId and $ImportedPackageVersion build variables");
 
             return description;
         }
