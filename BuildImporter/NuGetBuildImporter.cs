@@ -126,7 +126,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                     }
                 }
 
-                var rootCapturePath = Path.Combine(packageRootPath, (this.PackageArtifactRoot ?? string.Empty).TrimStart('/', '\\'));
+                var rootCapturePath = Path.Combine(packageRootPath, (this.PackageArtifactRoot ?? string.Empty).Replace('/', '\\').TrimStart('/', '\\'));
                 this.LogDebug("Capturing files in {0}...", rootCapturePath);
 
                 var rootEntry = Util.Files.GetDirectoryEntry(
@@ -141,13 +141,13 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 using (var agent = Util.Agents.CreateLocalAgent())
                 {
                     var fileOps = agent.GetService<IFileOperationsExecuter>();
-                    var matches = Util.Files.Comparison.GetMatches(packageRootPath, rootEntry, new[] { "!\\" + this.PackageId + ".nupkg", "*" });
+                    var matches = Util.Files.Comparison.GetMatches(rootCapturePath, rootEntry, new[] { "!\\" + this.PackageId + ".nupkg", "*" });
                     var artifactId = new ArtifactIdentifier(context.ApplicationId, context.ReleaseNumber, context.BuildNumber, context.DeployableId, artifactName);
 
                     this.LogInformation("Creating artifact {0}...", artifactName);
                     using (var artifact = new ArtifactBuilder(artifactId))
                     {
-                        artifact.RootPath = packageRootPath;
+                        artifact.RootPath = rootCapturePath;
 
                         foreach (var match in matches)
                             artifact.Add(match, fileOps);
@@ -178,7 +178,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 Server_Id: null,
                 ApplicationGroup_Id: null,
                 Application_Id: context.ApplicationId,
-                Deployable_Id: context.DeployableId,
+                Deployable_Id: null,
                 Release_Number: context.ReleaseNumber,
                 Build_Number: context.BuildNumber,
                 Execution_Id: null,

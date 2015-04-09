@@ -19,7 +19,10 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 PackageVersion = this.txtPackageVersion.Text,
                 IncludePrerelease = this.chkIncludePrerelease.Checked,
                 PackageSource = this.Template.PackageSource,
-                AdditionalArguments = this.Template.AdditionalArguments
+                AdditionalArguments = this.Template.AdditionalArguments,
+                CaptureIdAndVersion = this.Template.CaptureIdAndVersion,
+                IncludeVersionInArtifactName = this.Template.IncludeVersionInArtifactName,
+                PackageArtifactRoot = this.Template.PackageArtifactRoot
             };
         }
 

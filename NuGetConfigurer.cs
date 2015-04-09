@@ -80,7 +80,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                     }
                 }
 
-                return errors;
+                return !errors;
             }
             catch
             {
