@@ -2,6 +2,7 @@
 using Inedo.BuildMaster.Extensibility.Configurers.Extension;
 using Inedo.BuildMaster.Web.Controls.Extensions;
 using Inedo.Web.Controls;
+using Inedo.Web.Controls.SimpleHtml;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
@@ -10,6 +11,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         private ValidatingTextBox txtPackageSource;
         private ValidatingTextBox txtNuGetExe;
         private CheckBox chkUseProGet;
+        private CheckBox chkClearCache;
 
         public override void InitializeDefaultValues()
         {
@@ -21,6 +23,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             this.txtPackageSource.Text = configurer.PackageSource;
             this.txtNuGetExe.Text = configurer.NuGetExe;
             this.chkUseProGet.Checked = configurer.UseProGetClient;
+            this.chkClearCache.Checked = configurer.AlwaysClearNuGetCache;
         }
         public override ExtensionConfigurerBase CreateFromForm()
         {
@@ -28,7 +31,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
             {
                 PackageSource = this.txtPackageSource.Text,
                 NuGetExe = this.txtNuGetExe.Text,
-                UseProGetClient = this.chkUseProGet.Checked
+                UseProGetClient = this.chkUseProGet.Checked,
+                AlwaysClearNuGetCache = this.chkClearCache.Checked
             };
         }
 
@@ -49,10 +53,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 Text = "Use proget.exe instead of nuget.exe for installing packages"
             };
 
+            this.chkClearCache = new CheckBox
+            {
+                Text = "Attempt to clear the NuGet cache before packages are installed"
+            };
+
             this.Controls.Add(
                 new SlimFormField("Package source:", this.txtPackageSource),
                 new SlimFormField("NuGet client:", this.txtNuGetExe),
-                new SlimFormField("Options:", this.chkUseProGet)
+                new SlimFormField("Options:", new Div(this.chkUseProGet), new Div(this.chkClearCache))
             );
         }
     }

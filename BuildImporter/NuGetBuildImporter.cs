@@ -40,6 +40,16 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
         public override void Import(IBuildImporterContext context)
         {
             var configurer = (NuGetConfigurer)this.GetExtensionConfigurer();
+
+            if (configurer.AlwaysClearNuGetCache)
+            {
+                this.LogDebug("Clearing NuGet cache...");
+                if (NuGetConfigurer.ClearCache())
+                    this.LogDebug("Cache cleared!");
+                else
+                    this.LogWarning("Error clearing cache; a file may be locked.");
+            }
+
             var nugetExe = configurer != null ? configurer.NuGetExe : null;
             if (string.IsNullOrEmpty(nugetExe))
                 nugetExe = Path.Combine(Path.GetDirectoryName(typeof(NuGetBuildImporter).Assembly.Location), "nuget.exe");

@@ -55,6 +55,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
             }
             else
             {
+                if (configurer.AlwaysClearNuGetCache)
+                {
+                    this.LogDebug("Clearing NuGet cache...");
+                    if (NuGetConfigurer.ClearCache())
+                        this.LogDebug("Cache cleared!");
+                    else
+                        this.LogWarning("Error clearing cache; a file may be locked.");
+                }
+
                 this.LogDebug("Installing packages using nuget.exe...");
 
                 var entry = agent.GetDirectoryEntry(

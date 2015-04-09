@@ -1,4 +1,6 @@
-﻿using Inedo.BuildMaster;
+﻿using System;
+using System.IO;
+using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Configurers.Extension;
 using Inedo.BuildMaster.Web;
 
@@ -34,6 +36,11 @@ namespace Inedo.BuildMasterExtensions.NuGet
         /// </summary>
         [Persistent]
         public string NuGetExe { get; set; }
+        /// <summary>
+        /// Attempts to clear everything from the local NuGet cache before installing packages.
+        /// </summary>
+        [Persistent]
+        public bool AlwaysClearNuGetCache { get; set; }
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this instance.
@@ -44,6 +51,41 @@ namespace Inedo.BuildMasterExtensions.NuGet
         public override string ToString()
         {
             return string.Empty;
+        }
+
+        internal static bool ClearCache()
+        {
+            try
+            {
+                var cachePath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.None),
+                    "NuGet",
+                    "Cache"
+                );
+
+                bool errors = false;
+
+                if (Directory.Exists(cachePath))
+                {
+                    foreach (var fileName in Directory.EnumerateFiles(cachePath, "*.nupkg", SearchOption.TopDirectoryOnly))
+                    {
+                        try
+                        {
+                            File.Delete(fileName);
+                        }
+                        catch
+                        {
+                            errors = true;
+                        }
+                    }
+                }
+
+                return errors;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
