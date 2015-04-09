@@ -85,7 +85,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 new SlimFormField(
                     "Options:",
                     new Div(this.chkCaptureIdAndVersion),
-                    new Div(this.chkCaptureIdAndVersion)
+                    new Div(this.chkIncludeVersionInArtifactName)
                 )
             );
         }
