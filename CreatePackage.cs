@@ -60,6 +60,11 @@ namespace Inedo.BuildMasterExtensions.NuGet
         /// </remarks>
         [Persistent]
         public string[] Properties { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether to pass the -IncludeReferenceProjects argument.
+        /// </summary>
+        [Persistent]
+        public bool IncludeReferencedProjects { get; set; }
 
         public override ActionDescription GetActionDescription()
         {
@@ -98,6 +103,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 argList.Add("-Version \"" + this.Version + "\"");
             if (this.Symbols)
                 argList.Add("-Symbols");
+            if (this.IncludeReferencedProjects)
+                argList.Add("-IncludeReferencedProjects");
             if (this.Build && !isNuspec)
                 argList.Add("-Build");
             if (this.Properties != null && this.Properties.Length > 0 && !isNuspec)

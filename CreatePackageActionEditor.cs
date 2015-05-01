@@ -5,6 +5,7 @@ using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
 using Inedo.Web.Controls;
+using Inedo.Web.Controls.SimpleHtml;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
@@ -14,6 +15,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         private SourceControlFileFolderPicker txtProjectPath;
         private ValidatingTextBox txtVersion;
         private CheckBox chkSymbols;
+        private CheckBox chkIncludeReferencedProjects;
         private ValidatingTextBox txtProperties;
         private SourceControlFileFolderPicker txtNuspecPath;
 
@@ -47,6 +49,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             this.txtVersion.Text = action.Version;
             this.chkSymbols.Checked = action.Symbols;
+            this.chkIncludeReferencedProjects.Checked = action.IncludeReferencedProjects;
             if (action.Properties != null)
                 this.txtProperties.Text = string.Join(Environment.NewLine, action.Properties);
         }
@@ -60,6 +63,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 ProjectPath = Util.Path2.GetFileName(path),
                 Version = this.txtVersion.Text,
                 Symbols = this.chkSymbols.Checked,
+                IncludeReferencedProjects = this.chkIncludeReferencedProjects.Checked,
                 Build = true,
                 Properties = this.txtProperties.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
             };
@@ -93,6 +97,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             };
 
             this.chkSymbols = new CheckBox { Text = "Create symbol package" };
+            this.chkIncludeReferencedProjects = new CheckBox { Text = "Include referenced projects" };
 
             var ctlNuspecFileField = new SlimFormField(".nuspec file:", this.txtNuspecPath) { ID = "ctlNuspecFileField" };
             var ctlProjectFileField = new SlimFormField("MSBuild project:", this.txtProjectPath) { ID = "ctlProjectFileField" };
@@ -109,7 +114,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 ctlProjectFileField,
                 new SlimFormField("Package version:", this.txtVersion),
                 ffgProperties,
-                new SlimFormField("Options:", this.chkSymbols),
+                new SlimFormField("Options:", new Div(this.chkSymbols), new Div(this.chkIncludeReferencedProjects)),
                 new RenderJQueryDocReadyDelegator(
                     w =>
                     {
