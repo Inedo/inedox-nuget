@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Inedo.BuildMaster;
+using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;
@@ -24,11 +25,11 @@ namespace Inedo.BuildMasterExtensions.NuGet
             return new ActionDescription(
                 new ShortActionDescription(
                     "Install NuGet packages to ",
-                    new DirectoryHilite(this.OverriddenSourceDirectory, Util.CoalesceStr(this.PackageOutputDirectory, "packages"))
+                    new BuildMaster.Extensibility.Actions.DirectoryHilite(this.OverriddenSourceDirectory, Util.CoalesceStr(this.PackageOutputDirectory, "packages"))
                 ),
                 new LongActionDescription(
                     "for projects in ",
-                    new DirectoryHilite(this.OverriddenSourceDirectory)
+                    new BuildMaster.Extensibility.Actions.DirectoryHilite(this.OverriddenSourceDirectory)
                 )
             );
         }
@@ -123,7 +124,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 }
                 else
                 {
-                    var outputDirectory = agent.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.PackageOutputDirectory);
+                    var outputDirectory = agent.GetWorkingDirectory(new SimpleBuildMasterContext(this.Context), this.PackageOutputDirectory);
                     this.LogInformation("Packages will be installed to {0}", outputDirectory);
                     cmdLine += outputDirectory + "\"";
                 }

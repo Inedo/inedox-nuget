@@ -14,7 +14,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         public override void BindToForm(ActionBase extension)
         {
             var action = (PushPackage)extension;
-            this.txtPackagePath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.PackagePath);
+            this.txtPackagePath.Text = Inedo.IO.PathEx.Combine(action.OverriddenSourceDirectory, action.PackagePath);
             this.txtApiKey.Text = action.ApiKey;
             this.txtServerUrl.Text = action.ServerUrl;
         }
@@ -22,8 +22,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
         {
             return new PushPackage
             {
-                OverriddenSourceDirectory = Util.Path2.GetDirectoryName(this.txtPackagePath.Text),
-                PackagePath = Util.Path2.GetFileName(this.txtPackagePath.Text),
+                OverriddenSourceDirectory = Inedo.IO.PathEx.GetDirectoryName(this.txtPackagePath.Text),
+                PackagePath = Inedo.IO.PathEx.GetFileName(this.txtPackagePath.Text),
                 ApiKey = this.txtApiKey.Text,
                 ServerUrl = this.txtServerUrl.Text
             };

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Inedo.BuildMaster;
+using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Web;
@@ -71,11 +72,11 @@ namespace Inedo.BuildMasterExtensions.NuGet
             return new ActionDescription(
                 new ShortActionDescription(
                     "Create NuGet package from ",
-                    new DirectoryHilite(this.OverriddenSourceDirectory, this.ProjectPath)
+                    new BuildMaster.Extensibility.DirectoryHilite(this.OverriddenSourceDirectory, this.ProjectPath)
                 ),
                 new LongActionDescription(
                     "in ",
-                    new DirectoryHilite(this.OverriddenTargetDirectory)
+                    new BuildMaster.Extensibility.DirectoryHilite(this.OverriddenTargetDirectory)
                 )
             );
         }
@@ -87,7 +88,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             var agent = this.Context.Agent.GetService<IFileOperationsExecuter>();
             if (this.ProjectPath.StartsWith("~\\"))
-                projectPath = agent.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.ProjectPath);
+                projectPath = agent.GetWorkingDirectory(new SimpleBuildMasterContext(this.Context), this.ProjectPath);
             else
                 projectPath = agent.CombinePath(this.Context.SourceDirectory, this.ProjectPath);
 

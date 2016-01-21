@@ -23,15 +23,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
         public override void BindToForm(ActionBase extension)
         {
             var action = (SetDependencyVersionsAction)extension;
-            this.txtNuspecFile.Text = string.IsNullOrEmpty(action.OverriddenSourceDirectory) ? action.NuspecFile : Util.Path2.Combine(action.OverriddenSourceDirectory, action.NuspecFile);
+            this.txtNuspecFile.Text = string.IsNullOrEmpty(action.OverriddenSourceDirectory) ? action.NuspecFile : Inedo.IO.PathEx.Combine(action.OverriddenSourceDirectory, action.NuspecFile);
             this.txtVersions.Text = string.Join(Environment.NewLine, action.DependencyVersions ?? new string[0]);
         }
         public override ActionBase CreateFromForm()
         {
             return new SetDependencyVersionsAction
             {
-                OverriddenSourceDirectory = Util.NullIf(Util.Path2.GetDirectoryName(this.txtNuspecFile.Text), string.Empty),
-                NuspecFile = Util.Path2.GetFileName(this.txtNuspecFile.Text),
+                OverriddenSourceDirectory = Util.NullIf(Inedo.IO.PathEx.GetDirectoryName(this.txtNuspecFile.Text), string.Empty),
+                NuspecFile = Inedo.IO.PathEx.GetFileName(this.txtNuspecFile.Text),
                 DependencyVersions = TryParseDependencies(this.txtVersions.Text)
             };
         }

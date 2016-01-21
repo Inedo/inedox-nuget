@@ -38,12 +38,12 @@ namespace Inedo.BuildMasterExtensions.NuGet
             var action = (CreatePackage)extension;
             if (action.ProjectPath == null || action.ProjectPath.EndsWith(".nuspec", StringComparison.OrdinalIgnoreCase))
             {
-                this.txtNuspecPath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
+                this.txtNuspecPath.Text = Inedo.IO.PathEx.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
                 this.ddlSourceType.SelectedValue = "nuspec";
             }
             else
             {
-                this.txtProjectPath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
+                this.txtProjectPath.Text = Inedo.IO.PathEx.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
                 this.ddlSourceType.SelectedValue = "msbuild";
             }
 
@@ -59,8 +59,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             return new CreatePackage
             {
-                OverriddenSourceDirectory = Util.Path2.GetDirectoryName(path),
-                ProjectPath = Util.Path2.GetFileName(path),
+                OverriddenSourceDirectory = Inedo.IO.PathEx.GetDirectoryName(path),
+                ProjectPath = Inedo.IO.PathEx.GetFileName(path),
                 Version = this.txtVersion.Text,
                 Symbols = this.chkSymbols.Checked,
                 IncludeReferencedProjects = this.chkIncludeReferencedProjects.Checked,

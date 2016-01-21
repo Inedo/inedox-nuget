@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Xml;
 using Inedo.BuildMaster;
+using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Web;
@@ -66,9 +67,9 @@ namespace Inedo.BuildMasterExtensions.NuGet
             return new ActionDescription(
                 new ShortActionDescription(
                     "Generate ",
-                    new Hilite(this.OutputFileName),
+                    new BuildMaster.Extensibility.Actions.Hilite(this.OutputFileName),
                     " for ",
-                    new Hilite(this.Id + "." + this.Version)
+                    new BuildMaster.Extensibility.Actions.Hilite(this.Id + "." + this.Version)
                 )
             );
         }
@@ -152,7 +153,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             }
 
             var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
-            var fileName = fileOps.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.OutputFileName);
+            var fileName = fileOps.GetWorkingDirectory(new SimpleBuildMasterContext(this.Context), this.OutputFileName);
             this.LogInformation("Writing {0}...", fileName);
             fileOps.WriteFileBytes(fileName,buffer.ToArray());
         }

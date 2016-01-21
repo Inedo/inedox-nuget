@@ -8,6 +8,7 @@ using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.BuildImporters;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
+using Inedo.Diagnostics;
 using Inedo.NuGet.Packages;
 
 namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
@@ -162,7 +163,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
             {
                 try
                 {
-                    Util.Files.DeleteFolder(tempPath);
+                    Inedo.IO.DirectoryEx.Delete(tempPath);
                 }
                 catch
                 {
