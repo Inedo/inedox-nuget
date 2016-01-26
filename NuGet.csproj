@@ -54,7 +54,7 @@
     </Reference>
     <Reference Include="Inedo.NuGet">
       <HintPath>packages\Inedo.NuGet.23.1\lib\net40\Inedo.NuGet.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="InedoLib, Version=272.1.0.0, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
       <HintPath>packages\Inedo.BuildMaster.SDK.4.9\lib\net40\InedoLib.dll</HintPath>
