@@ -1,32 +1,34 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility.Actions;
+using Inedo.BuildMaster.Documentation;
+using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
     [Tag("nuget")]
-    [ActionProperties(
-        "Install NuGet Packages",
-        "Installs all packages required for projects in a solution to build.")]
+    [DisplayName("Install NuGet Packages")]
+    [Description("Installs all packages required for projects in a solution to build.")]
     [CustomEditor(typeof(InstallSolutionPackagesActionEditor))]
     public sealed class InstallSolutionPackagesAction : NuGetActionBase
     {
         [Persistent]
         public string PackageOutputDirectory { get; set; }
 
-        public override ActionDescription GetActionDescription()
+        public override ExtendedRichDescription GetActionDescription()
         {
-            return new ActionDescription(
-                new ShortActionDescription(
+            return new ExtendedRichDescription(
+                new RichDescription(
                     "Install NuGet packages to ",
-                    new DirectoryHilite(this.OverriddenSourceDirectory, Util.CoalesceStr(this.PackageOutputDirectory, "packages"))
+                    new DirectoryHilite(this.OverriddenSourceDirectory, AH.CoalesceString(this.PackageOutputDirectory, "packages"))
                 ),
-                new LongActionDescription(
+                new RichDescription(
                     "for projects in ",
                     new DirectoryHilite(this.OverriddenSourceDirectory)
                 )
@@ -123,7 +125,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 }
                 else
                 {
-                    var outputDirectory = agent.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.PackageOutputDirectory);
+                    var outputDirectory = agent.GetWorkingDirectory((IGenericBuildMasterContext)this.Context, this.PackageOutputDirectory);
                     this.LogInformation("Packages will be installed to {0}", outputDirectory);
                     cmdLine += outputDirectory + "\"";
                 }

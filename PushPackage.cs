@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility.Actions;
+using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
     [Tag("nuget")]
-    [ActionProperties(
-        "Publish NuGet Package",
-        "Publishes a package using NuGet.")]
+    [DisplayName("Publish NuGet Package")]
+    [Description("Publishes a package using NuGet.")]
     [CustomEditor(typeof(PushPackageActionEditor))]
     public sealed class PushPackage : NuGetActionBase
     {
@@ -19,10 +20,10 @@ namespace Inedo.BuildMasterExtensions.NuGet
         [Persistent]
         public string ServerUrl { get; set; }
 
-        public override ActionDescription GetActionDescription()
+        public override ExtendedRichDescription GetActionDescription()
         {
-            return new ActionDescription(
-                new ShortActionDescription(
+            return new ExtendedRichDescription(
+                new RichDescription(
                     "Publish ",
                     new DirectoryHilite(this.OverriddenSourceDirectory, this.PackagePath),
                     " to NuGet"

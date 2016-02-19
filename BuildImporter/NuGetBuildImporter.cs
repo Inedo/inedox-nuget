@@ -1,22 +1,24 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Artifacts;
 using Inedo.BuildMaster.Data;
-using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.BuildImporters;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
+using Inedo.Diagnostics;
+using Inedo.IO;
 using Inedo.NuGet.Packages;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
 {
     [Tag("nuget")]
-    [BuildImporterProperties(
-        "NuGet",
-        "Imports a NuGet package as a BuildMaster artifact.",
-        typeof(NuGetBuildImporterTemplate))]
+    [DisplayName("NuGet")]
+    [Description("Imports a NuGet package as a BuildMaster artifact.")]
+    [BuildImporterTemplate(typeof(NuGetBuildImporterTemplate))]
     [CustomEditor(typeof(NuGetBuildImporterEditor))]
     public sealed class NuGetBuildImporter : BuildImporterBase
     {
@@ -162,7 +164,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
             {
                 try
                 {
-                    Util.Files.DeleteFolder(tempPath);
+                    DirectoryEx.Delete(tempPath);
                 }
                 catch
                 {
@@ -172,7 +174,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
 
         private static void SetBuildVariable(IBuildImporterContext context, string variableName, string variableValue)
         {
-            StoredProcs.Variables_CreateOrUpdateVariableDefinition(
+            DB.Variables_CreateOrUpdateVariableDefinition(
                 Variable_Name: variableName,
                 Environment_Id: null,
                 Server_Id: null,
@@ -184,7 +186,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 Execution_Id: null,
                 Value_Text: variableValue,
                 Sensitive_Indicator: Domains.YN.No
-            ).Execute();
+            );
         }
 
         private void Process_OutputDataReceived(object sender, ProcessDataReceivedEventArgs<string> e)

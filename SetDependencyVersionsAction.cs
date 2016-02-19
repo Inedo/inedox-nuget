@@ -1,18 +1,20 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Inedo.BuildMaster;
+using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
     [Tag("nuget")]
-    [ActionProperties(
-        "Set Nuspec Dependency Versions",
-        "Sets versions required for specific dependencies in a .nuspec file.")]
+    [DisplayName("Set Nuspec Dependency Versions")]
+    [Description("Sets versions required for specific dependencies in a .nuspec file.")]
     [CustomEditor(typeof(SetDependencyVersionsActionEditor))]
     public sealed class SetDependencyVersionsAction : AgentBasedActionBase
     {
@@ -21,14 +23,14 @@ namespace Inedo.BuildMasterExtensions.NuGet
         [Persistent]
         public string[] DependencyVersions { get; set; }
 
-        public override ActionDescription GetActionDescription()
+        public override ExtendedRichDescription GetActionDescription()
         {
-            return new ActionDescription(
-                new ShortActionDescription(
+            return new ExtendedRichDescription(
+                new RichDescription(
                     "Write NuGet dependencies ",
                     new ListHilite(this.DependencyVersions)
                 ),
-                new LongActionDescription(
+                new RichDescription(
                     "to ",
                     new DirectoryHilite(this.OverriddenSourceDirectory, this.NuspecFile)
                 )

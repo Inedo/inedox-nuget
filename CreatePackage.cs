@@ -1,79 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility.Actions;
+using Inedo.BuildMaster.Documentation;
+using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
-    /// <summary>
-    /// Creates a NuGet package.
-    /// </summary>
     [Tag("nuget")]
-    [ActionProperties(
-        "Create NuGet Package",
-        "Creates a package using NuGet.")]
+    [DisplayName("Create NuGet Package")]
+    [Description("Creates a package using NuGet.")]
     [CustomEditor(typeof(CreatePackageActionEditor))]
     public sealed class CreatePackage : NuGetActionBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CreatePackage"/> class.
-        /// </summary>
-        public CreatePackage()
-        {
-        }
-
-        /// <summary>
-        /// Gets or sets the project or nuspec file to package.
-        /// </summary>
-        /// <remarks>
-        /// This is relative to the source directory.
-        /// </remarks>
         [Persistent]
         public string ProjectPath { get; set; }
-        /// <summary>
-        /// Gets or sets a value indicating whether to use verbose output.
-        /// </summary>
         [Persistent]
         public bool Verbose { get; set; }
-        /// <summary>
-        /// Gets or sets the version to use for the NuGet package. If null or empty, the nuspec value is used.
-        /// </summary>
         [Persistent]
         public string Version { get; set; }
-        /// <summary>
-        /// Gets or sets a value indicating whether to include symbols in the package.
-        /// </summary>
         [Persistent]
         public bool Symbols { get; set; }
-        /// <summary>
-        /// Gets or sets a value indicating whether to build a project.
-        /// </summary>
         [Persistent]
         public bool Build { get; set; }
-        /// <summary>
-        /// Gets or sets optional properties and values to pass to NuGet.
-        /// </summary>
-        /// <remarks>
-        /// These strings should be in the form Property=Value.
-        /// </remarks>
         [Persistent]
         public string[] Properties { get; set; }
-        /// <summary>
-        /// Gets or sets a value indicating whether to pass the -IncludeReferenceProjects argument.
-        /// </summary>
         [Persistent]
         public bool IncludeReferencedProjects { get; set; }
 
-        public override ActionDescription GetActionDescription()
+        public override ExtendedRichDescription GetActionDescription()
         {
-            return new ActionDescription(
-                new ShortActionDescription(
+            return new ExtendedRichDescription(
+                new RichDescription(
                     "Create NuGet package from ",
                     new DirectoryHilite(this.OverriddenSourceDirectory, this.ProjectPath)
                 ),
-                new LongActionDescription(
+                new RichDescription(
                     "in ",
                     new DirectoryHilite(this.OverriddenTargetDirectory)
                 )
@@ -87,7 +52,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             var agent = this.Context.Agent.GetService<IFileOperationsExecuter>();
             if (this.ProjectPath.StartsWith("~\\"))
-                projectPath = agent.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.ProjectPath);
+                projectPath = agent.GetWorkingDirectory((IGenericBuildMasterContext)this.Context, this.ProjectPath);
             else
                 projectPath = agent.CombinePath(this.Context.SourceDirectory, this.ProjectPath);
 

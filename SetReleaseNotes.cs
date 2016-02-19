@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Data;
+using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Providers.IssueTracking;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
     [Tag("nuget")]
-    [ActionProperties(
-        "Set Release Notes",
-        "Writes release notes to a .nuspec file using BuildMaster's release notes or the application's issue tracker.")]
+    [DisplayName("Set Release Notes")]
+    [Description("Writes release notes to a .nuspec file using BuildMaster's release notes or the application's issue tracker.")]
     [CustomEditor(typeof(SetReleaseNotesActionEditor))]
     public sealed class SetReleaseNotes : RemoteActionBase
     {
@@ -26,14 +27,14 @@ namespace Inedo.BuildMasterExtensions.NuGet
         [Persistent]
         public string NuspecFileName { get; set; }
 
-        public override ActionDescription GetActionDescription()
+        public override ExtendedRichDescription GetActionDescription()
         {
-            return new ActionDescription(
-                new ShortActionDescription(
+            return new ExtendedRichDescription(
+                new RichDescription(
                     "Write NuGet release notes to ",
                     new DirectoryHilite(this.OverriddenSourceDirectory, this.NuspecFileName)
                 ),
-                new LongActionDescription(
+                new RichDescription(
                     "using the application's ",
                     new Hilite(this.IncludeReleaseNotes ? "release notes" : "issue tracker")
                 )
@@ -48,22 +49,19 @@ namespace Inedo.BuildMasterExtensions.NuGet
             {
                 this.LogInformation("Retrieving application release notes...");
 
-                var releaseNotesTable = StoredProcs
-                    .Releases_GetReleaseNotes(this.Context.ApplicationId, this.Context.ReleaseNumber, null, null)
-                    .ExecuteDataTable();
+                var releaseNotesTable = DB.Releases_GetReleaseNotes(this.Context.ApplicationId, this.Context.ReleaseNumber, null, null);
 
-                foreach (DataRow releaseNoteRow in releaseNotesTable.Rows)
-                    allReleaseNotes.Add("* " + releaseNoteRow[TableDefs.ReleaseNotes_Extended.Notes_Text].ToString());
+                foreach (var releaseNoteRow in releaseNotesTable)
+                    allReleaseNotes.Add("* " + releaseNoteRow.Notes_Text);
 
-                this.LogDebug("Found {0} release note(s)", releaseNotesTable.Rows.Count);
+                this.LogDebug("Found {0} release notes", releaseNotesTable.Count);
             }
 
             if (this.IncludeIssues)
             {
                 this.LogInformation("Querying issue tracker for release notes...");
 
-                var application = StoredProcs.Applications_GetApplication(this.Context.ApplicationId)
-                    .Execute()
+                var application = DB.Applications_GetApplication(this.Context.ApplicationId)
                     .Applications_Extended
                     .First();
 
@@ -75,7 +73,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                         {
                             var categoryFilterable = proxy.TryGetService<ICategoryFilterable>();
                             if (categoryFilterable != null)
-                                categoryFilterable.CategoryIdFilter = Util.Persistence.DeserializeToStringArray(application.IssueTracking_CategoryIdList_Text ?? string.Empty);
+                                categoryFilterable.CategoryIdFilter = Persistence.DeserializeToStringArray(application.IssueTracking_CategoryIdList_Text ?? string.Empty);
 
                             var issueTracker = proxy.TryGetService<IssueTrackingProviderBase>();
                             IssueTrackerIssue[] issues = issueTracker.GetIssues(this.Context.ReleaseNumber);

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Web.UI.WebControls;
-using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
+using Inedo.IO;
 using Inedo.Web.Controls;
 using Inedo.Web.Controls.SimpleHtml;
 
@@ -24,26 +24,20 @@ namespace Inedo.BuildMasterExtensions.NuGet
             this.ValidateBeforeSave += this.CreatePackageActionEditor_ValidateBeforeSave;
         }
 
-        public override bool DisplayTargetDirectory
-        {
-            get { return true; }
-        }
-        public override string TargetDirectoryLabel
-        {
-            get { return "In:"; }
-        }
+        public override bool DisplayTargetDirectory => true;
+        public override string TargetDirectoryLabel => "In:";
 
         public override void BindToForm(ActionBase extension)
         {
             var action = (CreatePackage)extension;
             if (action.ProjectPath == null || action.ProjectPath.EndsWith(".nuspec", StringComparison.OrdinalIgnoreCase))
             {
-                this.txtNuspecPath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
+                this.txtNuspecPath.Text = PathEx.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
                 this.ddlSourceType.SelectedValue = "nuspec";
             }
             else
             {
-                this.txtProjectPath.Text = Util.Path2.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
+                this.txtProjectPath.Text = PathEx.Combine(action.OverriddenSourceDirectory, action.ProjectPath);
                 this.ddlSourceType.SelectedValue = "msbuild";
             }
 
@@ -59,8 +53,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             return new CreatePackage
             {
-                OverriddenSourceDirectory = Util.Path2.GetDirectoryName(path),
-                ProjectPath = Util.Path2.GetFileName(path),
+                OverriddenSourceDirectory = PathEx.GetDirectoryName(path),
+                ProjectPath = PathEx.GetFileName(path),
                 Version = this.txtVersion.Text,
                 Symbols = this.chkSymbols.Checked,
                 IncludeReferencedProjects = this.chkIncludeReferencedProjects.Checked,
@@ -105,7 +99,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             var ffgProperties = new SlimFormField("Properties:", this.txtProperties)
             {
                 ID = "ffgProperties",
-                HelpText = HelpText.FromHtml("Provide additional properties to pass to NuGet. Use the format Property=Value (one per line). For example:<br/><i>Configuration=Release</i>")
+                HelpText = "Provide additional properties to pass to NuGet. Use the format Property=Value (one per line). For example:<br/><i>Configuration=Release</i>"
             };
 
             this.Controls.Add(

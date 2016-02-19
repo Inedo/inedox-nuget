@@ -13,14 +13,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
         {
         }
 
-        protected int NuGet(string command, params string[] args)
-        {
-            return this.NuGetInternal("nuget.exe", command, args);
-        }
-        protected int ProGet(string command, params string[] args)
-        {
-            return this.NuGetInternal("proget.exe", command, args);
-        }
+        protected int NuGet(string command, params string[] args) => this.NuGetInternal("nuget.exe", command, args);
+        protected int ProGet(string command, params string[] args) => this.NuGetInternal("proget.exe", command, args);
 
         private int NuGetInternal(string fileName, string command, string[] args)
         {

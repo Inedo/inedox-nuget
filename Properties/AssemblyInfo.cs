@@ -12,6 +12,5 @@ using Inedo.BuildMaster.Extensibility;
 [assembly: AssemblyCopyright("Copyright © 2008 - 2014")]
 [assembly: AssemblyVersion("0.0.0.0")]
 [assembly: AssemblyFileVersion("0.0")]
-[assembly: BuildMasterAssembly]
 [assembly: CLSCompliant(false)]
 [assembly: RequiredBuildMasterVersion("3.0.0")]

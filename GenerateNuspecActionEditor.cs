@@ -111,11 +111,11 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 new SlimFormField("", this.chkRequireLicenseAcceptance),
                 new SlimFormField("Dependencies:", this.txtDependencies)
                 {
-                    HelpText = HelpText.FromHtml("Provide a list of other NuGet packages that this package depends on. Dependencies should be entered one per line in the format <i>ID:version</i>.")
+                    HelpText = "Provide a list of other NuGet packages that this package depends on. Dependencies should be entered one per line in the format <i>ID:version</i>."
                 },
                 new SlimFormField("Framework assemblies:", this.txtFrameworkAssemblies)
                 {
-                    HelpText = HelpText.FromHtml("Provide a list of .NET Framework assemblies that this package depends on. Assembly names should be entered one per line. For example, <i>PresentationCore</i>.")
+                    HelpText = "Provide a list of .NET Framework assemblies that this package depends on. Assembly names should be entered one per line. For example, <i>PresentationCore</i>."
                 }
             );
         }

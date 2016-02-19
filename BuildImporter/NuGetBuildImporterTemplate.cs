@@ -1,7 +1,7 @@
-﻿using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility;
+﻿using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.BuildImporters;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
 {
@@ -27,9 +27,9 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
         [Persistent]
         public bool IncludeVersionInArtifactName { get; set; }
 
-        public override ExtensionComponentDescription GetDescription()
+        public override RichDescription GetDescription()
         {
-            var description = new ExtensionComponentDescription(
+            var description = new RichDescription(
                 "Import NuGet package ",
                 new Hilite(this.PackageId)
             );

@@ -6,6 +6,7 @@ using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
+using Inedo.IO;
 using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.NuGet
@@ -23,15 +24,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
         public override void BindToForm(ActionBase extension)
         {
             var action = (SetDependencyVersionsAction)extension;
-            this.txtNuspecFile.Text = string.IsNullOrEmpty(action.OverriddenSourceDirectory) ? action.NuspecFile : Util.Path2.Combine(action.OverriddenSourceDirectory, action.NuspecFile);
+            this.txtNuspecFile.Text = string.IsNullOrEmpty(action.OverriddenSourceDirectory) ? action.NuspecFile : PathEx.Combine(action.OverriddenSourceDirectory, action.NuspecFile);
             this.txtVersions.Text = string.Join(Environment.NewLine, action.DependencyVersions ?? new string[0]);
         }
         public override ActionBase CreateFromForm()
         {
             return new SetDependencyVersionsAction
             {
-                OverriddenSourceDirectory = Util.NullIf(Util.Path2.GetDirectoryName(this.txtNuspecFile.Text), string.Empty),
-                NuspecFile = Util.Path2.GetFileName(this.txtNuspecFile.Text),
+                OverriddenSourceDirectory = Util.NullIf(PathEx.GetDirectoryName(this.txtNuspecFile.Text), string.Empty),
+                NuspecFile = PathEx.GetFileName(this.txtNuspecFile.Text),
                 DependencyVersions = TryParseDependencies(this.txtVersions.Text)
             };
         }
@@ -56,7 +57,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 new SlimFormField("Nuspec file:", this.txtNuspecFile),
                 new SlimFormField("Dependencies:", this.txtVersions)
                 {
-                    HelpText = HelpText.FromHtml("Provide a list of dependency versions to write to the .nuspec file in the format <i>Id=Version</i> (one per line). For example:<br/><i>jQuery=[1.9.1]<br/>Internal.Library=[%RELNO%.%BLDNO%]</i>")
+                    HelpText = "Provide a list of dependency versions to write to the .nuspec file in the format <i>Id=Version</i> (one per line). For example:<br/><i>jQuery=[1.9.1]<br/>Internal.Library=[$ReleaseName]</i>"
                 }
             );
         }

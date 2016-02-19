@@ -1,31 +1,23 @@
-﻿using System.IO;
+﻿using System.ComponentModel;
+using System.IO;
 using System.Xml;
 using Inedo.BuildMaster;
+using Inedo.BuildMaster.Documentation;
+using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
-    /// <summary>
-    /// Generates a .nuspec file.
-    /// </summary>
     [Tag("nuget")]
-    [ActionProperties(
-        "Generate .nuspec File",
-        "Writes a new NuGet .nuspec file suitable for use in creating a package.")]
+    [DisplayName("Generate .nuspec File")]
+    [Description("Writes a new NuGet .nuspec file suitable for use in creating a package.")]
     [CustomEditor(typeof(GenerateNuspecActionEditor))]
     public sealed class GenerateNuspecAction : AgentBasedActionBase
     {
         private const string NuspecSchema = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GenerateNuspecAction"/> class.
-        /// </summary>
-        public GenerateNuspecAction()
-        {
-            this.Version = "$ReleaseNumber";
-        }
 
         [Persistent]
         public string OutputFileName { get; set; }
@@ -33,7 +25,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         [Persistent]
         public string Id { get; set; }
         [Persistent]
-        public string Version { get; set; }
+        public string Version { get; set; } = "$ReleaseNumber";
         [Persistent]
         public string Title { get; set; }
         [Persistent]
@@ -61,10 +53,10 @@ namespace Inedo.BuildMasterExtensions.NuGet
         [Persistent]
         public string Tags { get; set; }
 
-        public override ActionDescription GetActionDescription()
+        public override ExtendedRichDescription GetActionDescription()
         {
-            return new ActionDescription(
-                new ShortActionDescription(
+            return new ExtendedRichDescription(
+                new RichDescription(
                     "Generate ",
                     new Hilite(this.OutputFileName),
                     " for ",
@@ -94,7 +86,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 writer.WriteElementString("version", NuspecSchema, this.Version);
                 writer.WriteElementString("authors", NuspecSchema, string.Join(", ", this.Authors));
                 writer.WriteElementString("description", NuspecSchema, this.Description);
-                
+
                 if (!string.IsNullOrEmpty(this.Title))
                     writer.WriteElementString("title", NuspecSchema, this.Title);
                 if (!string.IsNullOrEmpty(this.Summary))
@@ -152,9 +144,9 @@ namespace Inedo.BuildMasterExtensions.NuGet
             }
 
             var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
-            var fileName = fileOps.GetWorkingDirectory(this.Context.ApplicationId, this.Context.DeployableId ?? 0, this.OutputFileName);
+            var fileName = fileOps.GetWorkingDirectory((IGenericBuildMasterContext)this.Context, this.OutputFileName);
             this.LogInformation("Writing {0}...", fileName);
-            fileOps.WriteFileBytes(fileName,buffer.ToArray());
+            fileOps.WriteFileBytes(fileName, buffer.ToArray());
         }
     }
 }

@@ -59,8 +59,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
         {
             if (this.ddlReleaseNotesSource.SelectedValue == "ISSUES" || this.ddlReleaseNotesSource.SelectedValue == "ALL")
             {
-                var application = StoredProcs.Applications_GetApplication(this.ApplicationId)
-                    .Execute()
+                var application = DB.Applications_GetApplication(this.ApplicationId)
                     .Applications_Extended
                     .First();
 

@@ -9,14 +9,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
     {
         private SourceControlFileFolderPicker txtInstallPath;
 
-        public override bool DisplaySourceDirectory
-        {
-            get { return true; }
-        }
-        public override string SourceDirectoryLabel
-        {
-            get { return "For projects in:"; }
-        }
+        public override bool DisplaySourceDirectory => true;
+        public override string SourceDirectoryLabel => "For projects in:";
 
         public override void BindToForm(ActionBase extension)
         {
@@ -43,7 +37,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             this.Controls.Add(
                 new SlimFormField("To:", this.txtInstallPath)
                 {
-                    HelpText = HelpText.FromHtml("By default, packages will be installed to the <i>packages</i> folder at the solution level. If you have multiple solutions in the specified path or need to override this behavior, you may set the path explicitly here.")
+                    HelpText = "By default, packages will be installed to the <i>packages</i> folder at the solution level. If you have multiple solutions in the specified path or need to override this behavior, you may set the path explicitly here."
                 }
             );
         }
