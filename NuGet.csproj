@@ -74,37 +74,38 @@
     <Compile Include="BuildImporter\NuGetBuildImporterTemplateEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="CreatePackage.cs" />
-    <Compile Include="CreatePackageActionEditor.cs">
+    <Compile Include="Legacy\ActionImporters\InstallPackagesImporter.cs" />
+    <Compile Include="Legacy\CreatePackage.cs" />
+    <Compile Include="Legacy\CreatePackageActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Functions\NuGetExePathVariableFunction.cs" />
-    <Compile Include="GenerateNuspecAction.cs" />
-    <Compile Include="GenerateNuspecActionEditor.cs">
+    <Compile Include="Legacy\GenerateNuspecAction.cs" />
+    <Compile Include="Legacy\GenerateNuspecActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="InstallSolutionPackagesAction.cs" />
-    <Compile Include="InstallSolutionPackagesActionEditor.cs">
+    <Compile Include="Legacy\InstallSolutionPackagesAction.cs" />
+    <Compile Include="Legacy\InstallSolutionPackagesActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="NuGetActionBase.cs" />
-    <Compile Include="NuGetConfigurer.cs" />
-    <Compile Include="NuGetConfigurerEditor.cs">
+    <Compile Include="Legacy\NuGetActionBase.cs" />
+    <Compile Include="Legacy\NuGetConfigurer.cs" />
+    <Compile Include="Legacy\NuGetConfigurerEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Operations\InstallPackagesOperation.cs" />
     <Compile Include="Operations\PublishPackageOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PushPackage.cs" />
-    <Compile Include="PushPackageActionEditor.cs">
+    <Compile Include="Legacy\PushPackage.cs" />
+    <Compile Include="Legacy\PushPackageActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="SetDependencyVersionsAction.cs" />
-    <Compile Include="SetDependencyVersionsActionEditor.cs">
+    <Compile Include="Legacy\SetDependencyVersionsAction.cs" />
+    <Compile Include="Legacy\SetDependencyVersionsActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="SetReleaseNotes.cs" />
-    <Compile Include="SetReleaseNotesActionEditor.cs">
+    <Compile Include="Legacy\SetReleaseNotes.cs" />
+    <Compile Include="Legacy\SetReleaseNotesActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
   </ItemGroup>
