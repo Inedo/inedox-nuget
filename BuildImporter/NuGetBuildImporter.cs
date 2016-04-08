@@ -185,7 +185,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 Build_Number: context.BuildNumber,
                 Execution_Id: null,
                 Value_Text: variableValue,
-                Sensitive_Indicator: Domains.YN.No
+                Sensitive_Indicator: false,
+                Promotion_Id: null
             );
         }
 
