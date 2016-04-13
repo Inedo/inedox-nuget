@@ -51,7 +51,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 
             this.LogInformation($"Finding packages.config files in {sourceDirectory}...");
 
-            var configFiles = (from e in fileOps.GetFileSystemInfos(sourceDirectory, new MaskingContext(new[] { "**.packages.config" }, Enumerable.Empty<string>()))
+            var configFiles = (from e in fileOps.GetFileSystemInfos(sourceDirectory, new MaskingContext(new[] { "**packages.config" }, Enumerable.Empty<string>()))
+                               where string.Equals(e.Name, "packages.config", System.StringComparison.OrdinalIgnoreCase)
                                let f = e as SlimFileInfo
                                where f != null
                                select f).ToArray();
