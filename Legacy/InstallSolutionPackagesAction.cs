@@ -5,9 +5,11 @@ using System.Linq;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
+using Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters;
 using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
@@ -16,6 +18,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [DisplayName("Install NuGet Packages")]
     [Description("Installs all packages required for projects in a solution to build.")]
     [CustomEditor(typeof(InstallSolutionPackagesActionEditor))]
+    [ConvertibleToOperation(typeof(InstallPackagesImporter))]
     public sealed class InstallSolutionPackagesAction : NuGetActionBase
     {
         [Persistent]

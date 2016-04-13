@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Inedo.BuildMaster.Extensibility.Operations;
+﻿using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.BuildMasterExtensions.NuGet.Operations;
-using Inedo.IO;
 
 namespace Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters
 {
@@ -15,8 +9,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters
         {
             return new InstallPackagesOperation
             {
-                SourceDirectory = AH.NullIf(action.OverriddenSourceDirectory, string.Empty),
-                PackageOutputDirectory = AH.CoalesceString(action.PackageOutputDirectory, "packages")
+                SourceDirectory = context.ConvertLegacyExpression(AH.NullIf(action.OverriddenSourceDirectory, string.Empty)),
+                PackageOutputDirectory = context.ConvertLegacyExpression(AH.CoalesceString(action.PackageOutputDirectory, "packages"))
             };
         }
     }
