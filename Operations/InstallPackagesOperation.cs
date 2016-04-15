@@ -65,7 +65,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 
             foreach (var configFile in configFiles)
             {
-                this.LogInformation($"Installing packages for {configFile}...");
+                this.LogInformation($"Installing packages for {configFile.FullName}...");
                 await this.ExecuteNuGet(context, nugetExe, configFile.FullName, outputDirectory);
             }
 
