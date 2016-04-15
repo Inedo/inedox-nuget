@@ -3,11 +3,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
+using Inedo.Documentation;
 
 namespace Inedo.BuildMasterExtensions.NuGet.Operations
 {

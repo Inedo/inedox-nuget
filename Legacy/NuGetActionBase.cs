@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
+using Inedo.Documentation;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {

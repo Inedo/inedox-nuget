@@ -9,6 +9,7 @@ using Inedo.BuildMaster.Extensibility.BuildImporters;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
 using Inedo.Diagnostics;
+using Inedo.Documentation;
 using Inedo.IO;
 using Inedo.NuGet.Packages;
 using Inedo.Serialization;

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Xml.Linq;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Data;
-using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Providers.IssueTracking;
 using Inedo.BuildMaster.Web;
+using Inedo.Documentation;
 using Inedo.IO;
 using Inedo.Serialization;
 
