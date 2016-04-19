@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Web;
+using Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters;
 using Inedo.Documentation;
 using Inedo.Serialization;
 
@@ -10,6 +12,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [DisplayName("Publish NuGet Package")]
     [Description("Publishes a package using NuGet.")]
     [CustomEditor(typeof(PushPackageActionEditor))]
+    [ConvertibleToOperation(typeof(PushPackageImporter))]
     public sealed class PushPackage : NuGetActionBase
     {
         [Persistent]

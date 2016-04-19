@@ -116,7 +116,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         {
             return new ExtendedRichDescription(
                 new RichDescription(
-                    "Publish ",
+                    "Publish NuGet package ",
                     new DirectoryHilite(config[nameof(this.PackagePath)])
                 ),
                 new RichDescription(

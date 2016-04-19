@@ -14,20 +14,21 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
     [ScriptNamespace("NuGet")]
     [DisplayName("Install NuGet Packages")]
     [Description("Installs all packages required for projects in a solution to build.")]
-    public sealed class InstallPackagesOperation : ExecuteOperation
+    public sealed class InstallPackagesOperation : NuGetOperationBase
     {
+        [DisplayName("Output directory")]
+        [Description("The directory into which packages will be installed.")]
         [ScriptAlias("OutputDirectory")]
         [DefaultValue("packages")]
         public string PackageOutputDirectory { get; set; }
+        [DisplayName("Source directory")]
+        [Description("The working directory to use when installing packages.")]
         [ScriptAlias("SourceDirectory")]
         public string SourceDirectory { get; set; }
-        [ScriptAlias("NuGetExePath")]
-        [DefaultValue("$NuGetExePath")]
-        public string NuGetExePath { get; set; }
+        [DisplayName("Source URL")]
+        [Description("The NuGet package source URL. If not specified, the default source will be used for the current server.")]
         [ScriptAlias("Source")]
         public string ServerUrl { get; set; }
-        [ScriptAlias("Arguments")]
-        public string AdditionalArguments { get; set; }
 
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
@@ -86,32 +87,13 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
             );
         }
 
-        private string GetNuGetExePath(IFileOperationsExecuter fileOps)
-        {
-            if (!string.IsNullOrEmpty(this.NuGetExePath))
-                return this.NuGetExePath;
-
-            return PathEx.Combine(fileOps.GetBaseWorkingDirectory(), "ExtTemp", "NuGet", "nuget.exe");
-        }
-
         private Task ExecuteNuGet(IOperationExecutionContext context, string nugetExe, string packagesConfig, string outputDirectory)
         {
             var args = $"install \"{packagesConfig}\" -OutputDirectory \"{outputDirectory}\"";
             if (!string.IsNullOrWhiteSpace(this.ServerUrl))
                 args += "-Source \"" + this.ServerUrl + "\"";
-            if (!string.IsNullOrWhiteSpace(this.AdditionalArguments))
-                args += " " + this.AdditionalArguments;
 
-            this.LogDebug("Executing: " + nugetExe + " " + args);
-
-            return this.ExecuteCommandLineAsync(
-                context,
-                new AgentProcessStartInfo
-                {
-                    FileName = nugetExe,
-                    Arguments = args
-                }
-            );
+            return this.ExecuteNuGetAsync(context, nugetExe, args);
         }
     }
 }

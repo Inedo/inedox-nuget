@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Web;
+using Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters;
 using Inedo.Documentation;
 using Inedo.Serialization;
 
@@ -13,6 +15,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [DisplayName("Create NuGet Package")]
     [Description("Creates a package using NuGet.")]
     [CustomEditor(typeof(CreatePackageActionEditor))]
+    [ConvertibleToOperation(typeof(CreatePackageImporter))]
     public sealed class CreatePackage : NuGetActionBase
     {
         [Persistent]

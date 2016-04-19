@@ -77,7 +77,9 @@
     <Compile Include="BuildImporter\NuGetBuildImporterTemplateEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Legacy\ActionImporters\CreatePackageImporter.cs" />
     <Compile Include="Legacy\ActionImporters\InstallPackagesImporter.cs" />
+    <Compile Include="Legacy\ActionImporters\PushPackageImporter.cs" />
     <Compile Include="Legacy\CreatePackage.cs" />
     <Compile Include="Legacy\CreatePackageActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -96,7 +98,9 @@
     <Compile Include="Legacy\NuGetConfigurerEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Operations\CreatePackageOperation.cs" />
     <Compile Include="Operations\InstallPackagesOperation.cs" />
+    <Compile Include="Operations\NuGetOperationBase.cs" />
     <Compile Include="Operations\PublishPackageOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Legacy\PushPackage.cs" />
