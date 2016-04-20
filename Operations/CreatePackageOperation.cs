@@ -58,8 +58,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                 return;
 
             var sourceDirectory = context.ResolvePath(this.SourceDirectory ?? string.Empty);
-            var outputDirectory = PathEx.Combine(sourceDirectory, this.TargetDirectory ?? string.Empty);
-            var fullProjectPath = PathEx.Combine(sourceDirectory, this.ProjectPath ?? string.Empty);
+            var outputDirectory = PathEx.Combine(sourceDirectory, context.ResolvePath(this.TargetDirectory ?? string.Empty));
+            var fullProjectPath = PathEx.Combine(sourceDirectory, context.ResolvePath(this.ProjectPath));
 
             if (!fileOps.DirectoryExists(sourceDirectory))
             {
