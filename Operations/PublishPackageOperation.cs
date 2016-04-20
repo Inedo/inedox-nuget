@@ -62,7 +62,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                 var footer = GetMultipartFooter(boundary);
 
                 var request = WebRequest.CreateHttp(this.ServerUrl);
-                request.AllowWriteStreamBuffering = false;
+                //request.AllowWriteStreamBuffering = false;
                 request.Method = "PUT";
                 request.UserAgent = $"BuildMaster/{typeof(Operation).Assembly.GetName().Version} NuGet-Extension/{typeof(PublishPackageOperation).Assembly.GetName().Version} ({Environment.OSVersion})";
                 request.ContentType = "multipart/form-data; boundary=" + boundary;
@@ -135,6 +135,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                 writer.WriteLine("--" + boundary);
                 writer.WriteLine("Content-Disposition: form-data; name=\"package\"; filename=\"package\"");
                 writer.WriteLine("Content-Type: application/octet-stream");
+                writer.WriteLine();
 
                 writer.Flush();
                 return stream.ToArray();
