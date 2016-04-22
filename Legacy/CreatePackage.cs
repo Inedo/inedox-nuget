@@ -54,7 +54,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
             var agent = this.Context.Agent.GetService<IFileOperationsExecuter>();
             if (this.ProjectPath.StartsWith("~\\"))
-                projectPath = agent.GetWorkingDirectory((IGenericBuildMasterContext)this.Context, this.ProjectPath);
+                projectPath = agent.CombinePath(agent.GetLegacyWorkingDirectory((IGenericBuildMasterContext)this.Context, this.ProjectPath));
             else
                 projectPath = agent.CombinePath(this.Context.SourceDirectory, this.ProjectPath);
 

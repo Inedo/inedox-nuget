@@ -42,18 +42,17 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BuildMaster.Web.Controls, Version=5.0.0.97, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
+    <Reference Include="BuildMaster.Web.Controls">
       <HintPath>packages\Inedo.BuildMaster.SDK.5.0\lib\net45\BuildMaster.Web.Controls.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BuildMasterCore, Version=5.0.0.97, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
+    <Reference Include="BuildMasterCore">
       <HintPath>packages\Inedo.BuildMaster.SDK.5.0\lib\net45\BuildMasterCore.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="Inedo.NuGet, Version=27.1.0.0, Culture=neutral, PublicKeyToken=c4cb5218f57bca74, processorArchitecture=MSIL">
       <HintPath>packages\Inedo.NuGet.27.1\lib\net45\Inedo.NuGet.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="InedoLib, Version=370.1.0.0, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">

@@ -143,7 +143,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
             }
 
             var fileOps = this.Context.Agent.GetService<IFileOperationsExecuter>();
-            var fileName = fileOps.GetWorkingDirectory((IGenericBuildMasterContext)this.Context, this.OutputFileName);
+            var fileName = fileOps.GetLegacyWorkingDirectory((IGenericBuildMasterContext)this.Context, this.OutputFileName);
             this.LogInformation("Writing {0}...", fileName);
             fileOps.WriteFileBytes(fileName, buffer.ToArray());
         }
