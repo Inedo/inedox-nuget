@@ -91,7 +91,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         {
             var args = $"install \"{packagesConfig}\" -OutputDirectory \"{outputDirectory}\"";
             if (!string.IsNullOrWhiteSpace(this.ServerUrl))
-                args += "-Source \"" + this.ServerUrl + "\"";
+                args += " -Source \"" + this.ServerUrl + "\"";
 
             return this.ExecuteNuGetAsync(context, nugetExe, args);
         }

@@ -128,7 +128,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 }
                 else
                 {
-                    var outputDirectory = agent.GetWorkingDirectory((IGenericBuildMasterContext)this.Context, this.PackageOutputDirectory);
+                    var outputDirectory = agent.CombinePath(this.Context.SourceDirectory, this.PackageOutputDirectory);
                     this.LogInformation("Packages will be installed to {0}", outputDirectory);
                     cmdLine += outputDirectory + "\"";
                 }
