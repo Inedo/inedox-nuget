@@ -7,10 +7,13 @@ namespace Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters
     {
         public ConvertedOperation<InstallPackagesOperation> ConvertActionToOperation(InstallSolutionPackagesAction action, IActionConverterContext context)
         {
+            var configurer = context.Configurer as NuGetConfigurer;
+
             return new InstallPackagesOperation
             {
                 SourceDirectory = context.ConvertLegacyExpression(AH.NullIf(action.OverriddenSourceDirectory, string.Empty)),
-                PackageOutputDirectory = context.ConvertLegacyExpression(AH.CoalesceString(action.PackageOutputDirectory, "packages"))
+                PackageOutputDirectory = context.ConvertLegacyExpression(AH.CoalesceString(action.PackageOutputDirectory, "packages")),
+                ServerUrl = AH.NullIf(configurer?.PackageSource, string.Empty)
             };
         }
     }
