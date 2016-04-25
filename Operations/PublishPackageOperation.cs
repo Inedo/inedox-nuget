@@ -8,15 +8,17 @@ using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
+using Inedo.IO;
 
 namespace Inedo.BuildMasterExtensions.NuGet.Operations
 {
+    [Serializable]
     [ScriptAlias("Publish-Package")]
     [ScriptNamespace("NuGet")]
     [DisplayName("Publish NuGet Package")]
     [Description("Publishes a package to a NuGet feed.")]
     [DefaultProperty(nameof(PackagePath))]
-    public sealed class PublishPackageOperation : ExecuteOperation
+    public sealed class PublishPackageOperation : RemoteExecuteOperation
     {
         [Required]
         [ScriptAlias("Package")]
@@ -42,20 +44,19 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [Description("The password used to connect to the NuGet feed when authorization is required.")]
         public string Password { get; set; }
 
-        public override async Task ExecuteAsync(IOperationExecutionContext context)
+        protected override async Task RemoteExecuteAsync(IRemoteOperationExecutionContext context)
         {
             var packagePath = context.ResolvePath(this.PackagePath);
-            var fileOps = context.Agent.GetService<IFileOperationsExecuter>();
 
             this.LogInformation($"Pushing {packagePath} to {this.ServerUrl}...");
 
-            if (!fileOps.FileExists(packagePath))
+            if (!FileEx.Exists(packagePath))
             {
                 this.LogError(packagePath + " does not exist.");
                 return;
             }
 
-            using (var packageStream = fileOps.OpenFile(packagePath, FileMode.Open, FileAccess.Read))
+            using (var packageStream = FileEx.Open(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, FileOptions.SequentialScan | FileOptions.Asynchronous))
             {
                 var boundary = GenerateBoundary();
                 var header = GetMultipartHeader(boundary);
