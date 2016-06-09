@@ -2,8 +2,8 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using Inedo.Agents;
 using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;

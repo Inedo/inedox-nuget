@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using Inedo.Agents;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Artifacts;
 using Inedo.BuildMaster.Data;
@@ -80,7 +81,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 this.LogDebug("Executing {0} {1}", nugetExe, args);
                 this.LogInformation("Executing NuGet...");
 
-                using (var process = new LocalTextDataProcess(new AgentProcessStartInfo { FileName = nugetExe, Arguments = args }))
+                using (var process = new LocalProcess(new RemoteProcessStartInfo { FileName = nugetExe, Arguments = args }))
                 {
                     process.OutputDataReceived += this.Process_OutputDataReceived;
                     process.ErrorDataReceived += this.Process_ErrorDataReceived;
@@ -191,12 +192,12 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
             );
         }
 
-        private void Process_OutputDataReceived(object sender, ProcessDataReceivedEventArgs<string> e)
+        private void Process_OutputDataReceived(object sender, ProcessDataReceivedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(e.Data))
                 this.LogDebug(e.Data);
         }
-        private void Process_ErrorDataReceived(object sender, ProcessDataReceivedEventArgs<string> e)
+        private void Process_ErrorDataReceived(object sender, ProcessDataReceivedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(e.Data))
                 this.LogError(e.Data);

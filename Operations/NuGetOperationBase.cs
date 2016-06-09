@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
+using Inedo.Agents;
 using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.IO;
@@ -40,7 +40,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 
             return this.ExecuteCommandLineAsync(
                 context,
-                new AgentProcessStartInfo
+                new RemoteProcessStartInfo
                 {
                     FileName = nugetExe,
                     Arguments = args

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using Inedo.Agents;
 using Inedo.BuildMaster.Extensibility.Actions;
-using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.Documentation;
 
 namespace Inedo.BuildMasterExtensions.NuGet
@@ -31,7 +31,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 var baseWorkingDirectory = fileOps.GetBaseWorkingDirectory();
 
                 nugetPath = Path.Combine(baseWorkingDirectory, @"ExtTemp\NuGet\" + fileName);
-                var fileInfo = fileOps.GetFileEntry(nugetPath);
+                var fileInfo = fileOps.GetFileInfo(nugetPath);
                 if (fileInfo == null)
                 {
                     var path = Path.Combine(
