@@ -2,9 +2,10 @@
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
@@ -56,57 +57,50 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                 return;
             }
 
-            using (var packageStream = FileEx.Open(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, FileOptions.SequentialScan | FileOptions.Asynchronous))
-            {
-                var boundary = GenerateBoundary();
-                var header = GetMultipartHeader(boundary);
-                var footer = GetMultipartFooter(boundary);
+            var handler = new HttpClientHandler { Proxy = WebRequest.DefaultWebProxy };
 
-                var request = WebRequest.CreateHttp(this.ServerUrl);
-                request.Method = "PUT";
-                request.UserAgent = $"BuildMaster/{typeof(Operation).Assembly.GetName().Version} NuGet-Extension/{typeof(PublishPackageOperation).Assembly.GetName().Version} ({Environment.OSVersion})";
-                request.ContentType = "multipart/form-data; boundary=" + boundary;
-                request.ContentLength = header.Length + packageStream.Length + footer.Length;
+            if (string.IsNullOrWhiteSpace(this.UserName) || string.IsNullOrEmpty(this.Password))
+            {
+                this.LogDebug("No credentials specified; sending default credentials.");
+                handler.PreAuthenticate = true;
+                handler.UseDefaultCredentials = true;
+            }
+
+            using (var client = new HttpClient(handler))
+            {
+                client.DefaultRequestHeaders.UserAgent.Clear();
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("BuildMaster", typeof(Operation).Assembly.GetName().Version.ToString()));
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("NuGet-Extension", typeof(PublishPackageOperation).Assembly.GetName().Version.ToString()));
+
                 if (!string.IsNullOrWhiteSpace(this.ApiKey))
                 {
                     this.LogDebug("API key is specified; adding X-NUGET-APIKEY request header.");
-                    request.Headers.Add("X-NUGET-APIKEY", this.ApiKey);
+                    client.DefaultRequestHeaders.Add("X-NUGET-APIKEY", this.ApiKey);
                 }
 
                 if (!string.IsNullOrWhiteSpace(this.UserName) && !string.IsNullOrEmpty(this.Password))
                 {
                     this.LogDebug($"Sending basic auth credentials (user={this.UserName}).");
-                    request.Headers.Add(HttpRequestHeader.Authorization, "Basic " + Convert.ToBase64String(InedoLib.UTF8Encoding.GetBytes(this.UserName + ":" + this.Password)));
-                }
-                else
-                {
-                    this.LogDebug("No credentials specified; sending default credentials.");
-                    request.PreAuthenticate = true;
-                    request.UseDefaultCredentials = true;
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(InedoLib.UTF8Encoding.GetBytes(this.UserName + ":" + this.Password)));
                 }
 
-                using (var requestStream = await request.GetRequestStreamAsync())
+                using (var packageStream = FileEx.Open(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, FileOptions.SequentialScan | FileOptions.Asynchronous))
+                using (var contentStream = new StreamContent(packageStream))
+                using (var formData = new MultipartFormDataContent())
                 {
-                    await requestStream.WriteAsync(header, 0, header.Length);
-                    await packageStream.CopyToAsync(requestStream);
-                    await requestStream.WriteAsync(footer, 0, footer.Length);
-                }
-
-                try
-                {
-                    using (var response = (HttpWebResponse)await request.GetResponseAsync())
+                    contentStream.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    formData.Add(contentStream, "package", "package");
+                    using (var response = await client.PutAsync(this.ServerUrl, formData, context.CancellationToken).ConfigureAwait(false))
                     {
-                        this.LogDebug($"Server responded with {(int)response.StatusCode}: {response.StatusDescription}");
-                        this.LogInformation("Package pushed!");
-                    }
-                }
-                catch (WebException ex)
-                {
-                    var response = (HttpWebResponse)ex.Response;
-                    this.LogError($"Server responded with {(int)response.StatusCode}: {response.StatusDescription}");
-                    using (var reader = new StreamReader(response.GetResponseStream(), InedoLib.UTF8Encoding))
-                    {
-                        this.LogError(await reader.ReadToEndAsync());
+                        if (response.IsSuccessStatusCode)
+                        {
+                            this.LogInformation("Package pushed!");
+                        }
+                        else
+                        {
+                            this.LogError($"Server responded with {(int)response.StatusCode}: {response.ReasonPhrase}");
+                            this.LogError(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                        }
                     }
                 }
             }
@@ -124,34 +118,6 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                     new Hilite(config[nameof(this.ServerUrl)])
                 )
             );
-        }
-
-        private static string GenerateBoundary() => new string('-', 10) + Guid.NewGuid().ToString("n");
-        private static byte[] GetMultipartHeader(string boundary)
-        {
-            using (var stream = new MemoryStream())
-            {
-                var writer = new StreamWriter(stream, InedoLib.UTF8Encoding);
-                writer.WriteLine("--" + boundary);
-                writer.WriteLine("Content-Disposition: form-data; name=\"package\"; filename=\"package\"");
-                writer.WriteLine("Content-Type: application/octet-stream");
-                writer.WriteLine();
-
-                writer.Flush();
-                return stream.ToArray();
-            }
-        }
-        private static byte[] GetMultipartFooter(string boundary)
-        {
-            using (var stream = new MemoryStream())
-            {
-                var writer = new StreamWriter(stream, InedoLib.UTF8Encoding);
-                writer.WriteLine();
-                writer.Write("--" + boundary + "--");
-
-                writer.Flush();
-                return stream.ToArray();
-            }
         }
     }
 }
