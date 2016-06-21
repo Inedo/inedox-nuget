@@ -45,7 +45,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [Description("The password used to connect to the NuGet feed when authorization is required.")]
         public string Password { get; set; }
 
-        protected override async Task RemoteExecuteAsync(IRemoteOperationExecutionContext context)
+        protected override async Task<object> RemoteExecuteAsync(IRemoteOperationExecutionContext context)
         {
             var packagePath = context.ResolvePath(this.PackagePath);
 
@@ -54,7 +54,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
             if (!FileEx.Exists(packagePath))
             {
                 this.LogError(packagePath + " does not exist.");
-                return;
+                return null;
             }
 
             var handler = new HttpClientHandler { Proxy = WebRequest.DefaultWebProxy };
@@ -104,6 +104,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                     }
                 }
             }
+
+            return null;
         }
 
         protected override ExtendedRichDescription GetDescription(IOperationConfiguration config)
