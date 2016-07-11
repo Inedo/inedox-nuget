@@ -74,8 +74,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 
                 if (!string.IsNullOrWhiteSpace(this.ApiKey))
                 {
-                    this.LogDebug("API key is specified; adding X-NUGET-APIKEY request header.");
-                    client.DefaultRequestHeaders.Add("X-NUGET-APIKEY", this.ApiKey);
+                    this.LogDebug("API key is specified; adding X-NuGet-ApiKey request header.");
+                    client.DefaultRequestHeaders.Add("X-NuGet-ApiKey", this.ApiKey);
                 }
 
                 if (!string.IsNullOrWhiteSpace(this.UserName) && !string.IsNullOrEmpty(this.Password))
