@@ -5,8 +5,6 @@ using System.Linq;
 using Inedo.Agents;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions;
-using Inedo.BuildMaster.Extensibility.Agents;
-using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
 using Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters;
 using Inedo.Documentation;
@@ -71,18 +69,10 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
                 this.LogDebug("Installing packages using nuget.exe...");
 
-                var entry = agent.GetDirectoryEntry(
-                    new GetDirectoryEntryCommand
-                    {
-                        Path = this.Context.SourceDirectory,
-                        IncludeRootPath = true,
-                        Recurse = true
-                    }
-                ).Entry;
+                var infos = agent.GetFileSystemInfos(this.Context.SourceDirectory, IO.MaskingContext.IncludeAll);
 
-                var configFiles = entry
-                    .Flatten()
-                    .SelectMany(e => e.Files ?? Enumerable.Empty<FileEntryInfo>())
+                var configFiles = agent.GetFileSystemInfos(this.Context.SourceDirectory, IO.MaskingContext.IncludeAll)
+                    .OfType<IO.SlimFileInfo>()
                     .Where(e => string.Equals(e.Name, "packages.config", StringComparison.OrdinalIgnoreCase));
 
                 if (!configFiles.Any())
@@ -98,9 +88,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
                     string bestGuess;
 
                     this.LogDebug("Attempting to determine package output directory...");
-                    var solutionFiles = entry
-                        .Flatten()
-                        .SelectMany(e => e.Files ?? Enumerable.Empty<FileEntryInfo>())
+                    var solutionFiles = infos
+                        .OfType<IO.SlimFileInfo>()
                         .Where(e => e.Name.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
                         .ToList();
 
@@ -111,13 +100,13 @@ namespace Inedo.BuildMasterExtensions.NuGet
                     }
                     else if (solutionFiles.Count == 1)
                     {
-                        this.LogDebug("Using {0} to determine package install path.", solutionFiles[0].Path);
-                        bestGuess = agent.CombinePath(Path.GetDirectoryName(solutionFiles[0].Path), "packages");
+                        this.LogDebug("Using {0} to determine package install path.", solutionFiles[0].FullName);
+                        bestGuess = agent.CombinePath(Path.GetDirectoryName(solutionFiles[0].FullName), "packages");
                     }
                     else
                     {
-                        this.LogWarning("Multiple .sln files were found in {0}. Using {1} to determine package install path.", this.Context.SourceDirectory, solutionFiles[0].Path);
-                        bestGuess = agent.CombinePath(Path.GetDirectoryName(solutionFiles[0].Path), "packages");
+                        this.LogWarning("Multiple .sln files were found in {0}. Using {1} to determine package install path.", this.Context.SourceDirectory, solutionFiles[0].FullName);
+                        bestGuess = agent.CombinePath(Path.GetDirectoryName(solutionFiles[0].FullName), "packages");
                     }
 
                     if (solutionFiles.Count != 1)
@@ -140,8 +129,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
                 foreach (var configFile in configFiles)
                 {
-                    this.LogInformation("Installing packages for {0}...", configFile.Path);
-                    this.NuGet("install", string.Format(cmdLine, configFile.Path));
+                    this.LogInformation("Installing packages for {0}...", configFile.FullName);
+                    this.NuGet("install", string.Format(cmdLine, configFile.FullName));
                 }
             }
         }
