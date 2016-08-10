@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Inedo.Agents;
 using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.IO;
@@ -24,12 +25,15 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [Description("When specified, these arguments will be passed to NuGet.exe verbatim.")]
         public string AdditionalArguments { get; set; }
 
-        protected string GetNuGetExePath(IFileOperationsExecuter fileOps)
+        protected string GetNuGetExePath(IOperationExecutionContext context)
         {
             if (!string.IsNullOrEmpty(this.NuGetExePath))
-                return this.NuGetExePath;
+                return context.ResolvePath(this.NuGetExePath);
 
-            return PathEx.Combine(fileOps.GetBaseWorkingDirectory(), "ExtTemp", "NuGet", "nuget.exe");
+            var executer = context.Agent.GetService<IRemoteMethodExecuter>();
+            string assemblyDir = executer.InvokeFunc(GetNugetExeDirectory);
+
+            return PathEx.Combine(assemblyDir, "nuget.exe");
         }
         protected Task ExecuteNuGetAsync(IOperationExecutionContext context, string nugetExe, string args)
         {
@@ -46,6 +50,11 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                     Arguments = args
                 }
             );
+        }
+
+        private static string GetNugetExeDirectory()
+        {
+            return PathEx.GetDirectoryName(typeof(NuGetOperationBase).Assembly.Location);
         }
     }
 }

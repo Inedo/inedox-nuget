@@ -33,7 +33,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
             var fileOps = context.Agent.GetService<IFileOperationsExecuter>();
-            var nugetExe = this.GetNuGetExePath(fileOps);
+            var nugetExe = this.GetNuGetExePath(context);
             if (string.IsNullOrEmpty(nugetExe))
                 return;
 
