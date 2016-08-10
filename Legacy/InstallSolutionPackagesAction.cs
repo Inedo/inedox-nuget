@@ -8,6 +8,7 @@ using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Web;
 using Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters;
 using Inedo.Documentation;
+using Inedo.IO;
 using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
@@ -41,6 +42,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
             var agent = this.Context.Agent.GetService<IFileOperationsExecuter>();
             var configurer = (NuGetConfigurer)this.GetExtensionConfigurer();
 
+            string packageOutputDirectory = GetAppRelativePath(this.PackageOutputDirectory, this.Context);
+
             if (configurer.UseProGetClient)
             {
                 this.LogDebug("Installing packages using proget.exe...");
@@ -51,8 +54,8 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 }
 
                 var cmdLine = "-SolutionDirectory \"" + this.Context.SourceDirectory + "\" -Source \"" + configurer.PackageSource + "\"";
-                if (!string.IsNullOrEmpty(this.PackageOutputDirectory))
-                    cmdLine += " -OutputDirectory \"" + this.PackageOutputDirectory + "\"";
+                if (!string.IsNullOrEmpty(packageOutputDirectory))
+                    cmdLine += " -OutputDirectory \"" + packageOutputDirectory + "\"";
 
                 this.ProGet("install", cmdLine);
             }
@@ -83,7 +86,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
                 var cmdLine = "\"{0}\" -OutputDirectory \"";
 
-                if (string.IsNullOrEmpty(this.PackageOutputDirectory))
+                if (string.IsNullOrEmpty(packageOutputDirectory))
                 {
                     string bestGuess;
 
@@ -117,7 +120,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
                 }
                 else
                 {
-                    var outputDirectory = agent.CombinePath(this.Context.SourceDirectory, this.PackageOutputDirectory);
+                    var outputDirectory = agent.CombinePath(this.Context.SourceDirectory, packageOutputDirectory);
                     this.LogInformation("Packages will be installed to {0}", outputDirectory);
                     cmdLine += outputDirectory + "\"";
                 }
@@ -133,6 +136,20 @@ namespace Inedo.BuildMasterExtensions.NuGet
                     this.NuGet("install", string.Format(cmdLine, configFile.FullName));
                 }
             }
+        }
+
+        private static string GetAppRelativePath(string path, IAgentBasedActionExecutionContext context)
+        {
+            if (string.IsNullOrEmpty(path))
+                return string.Empty;
+
+            if (path.StartsWith("~\\") || path.StartsWith("~/"))
+            {
+                var appDir = context.ApplicationDirectory;
+                return PathEx.Combine(appDir, path.Substring(2));
+            }
+
+            return path;
         }
     }
 }
