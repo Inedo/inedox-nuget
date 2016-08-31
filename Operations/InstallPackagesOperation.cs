@@ -24,6 +24,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [DisplayName("Source directory")]
         [Description("The working directory to use when installing packages.")]
         [ScriptAlias("SourceDirectory")]
+        [PlaceholderText("$WorkingDirectory")]
         public string SourceDirectory { get; set; }
         [DisplayName("Source URL")]
         [Description("The NuGet package source URL. If not specified, the default source will be used for the current server.")]
@@ -38,7 +39,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                 return;
 
             var sourceDirectory = context.ResolvePath(this.SourceDirectory);
-            var outputDirectory = context.ResolvePath(PathEx.Combine(this.SourceDirectory, this.PackageOutputDirectory));
+            var outputDirectory = context.ResolvePath(PathEx.Combine(sourceDirectory, this.PackageOutputDirectory));
 
             this.LogInformation($"Installing packages for projects in {sourceDirectory} to {outputDirectory}...");
 
