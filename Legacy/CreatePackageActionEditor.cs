@@ -12,12 +12,12 @@ namespace Inedo.BuildMasterExtensions.NuGet
     internal sealed class CreatePackageActionEditor : ActionEditorBase
     {
         private DropDownList ddlSourceType;
-        private SourceControlFileFolderPicker txtProjectPath;
+        private FileBrowserTextBox txtProjectPath;
         private ValidatingTextBox txtVersion;
         private CheckBox chkSymbols;
         private CheckBox chkIncludeReferencedProjects;
         private ValidatingTextBox txtProperties;
-        private SourceControlFileFolderPicker txtNuspecPath;
+        private FileBrowserTextBox txtNuspecPath;
 
         public CreatePackageActionEditor()
         {
@@ -69,15 +69,15 @@ namespace Inedo.BuildMasterExtensions.NuGet
             this.ddlSourceType.Items.Add(new ListItem(".nuspec file", "nuspec"));
             this.ddlSourceType.Items.Add(new ListItem("msbuild project", "msbuild"));
 
-            this.txtNuspecPath = new SourceControlFileFolderPicker
+            this.txtNuspecPath = new FileBrowserTextBox
             {
-                DisplayMode = SourceControlBrowser.DisplayModes.FoldersAndFiles,
+                IncludeFiles = true,
                 ServerId = this.ServerId
             };
 
-            this.txtProjectPath = new SourceControlFileFolderPicker
+            this.txtProjectPath = new FileBrowserTextBox
             {
-                DisplayMode = SourceControlBrowser.DisplayModes.FoldersAndFiles,
+                IncludeFiles = true,
                 ServerId = this.ServerId
             };
 

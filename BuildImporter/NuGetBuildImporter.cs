@@ -142,7 +142,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                     }
                 ).Entry;
 
-                using (var agent = Util.Agents.CreateLocalAgent())
+                using (var agent = BuildMasterAgent.CreateLocalAgent())
                 {
                     var fileOps = agent.GetService<IFileOperationsExecuter>();
                     var matches = Util.Files.Comparison.GetMatches(rootCapturePath, rootEntry, new[] { "!\\" + this.PackageId + ".nupkg", "*" });

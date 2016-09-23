@@ -10,7 +10,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 {
     internal sealed class GenerateNuspecActionEditor : ActionEditorBase
     {
-        private SourceControlFileFolderPicker txtFileName;
+        private FileBrowserTextBox txtFileName;
         private ValidatingTextBox txtId;
         private ValidatingTextBox txtVersion;
         private ValidatingTextBox txtAuthors;
@@ -74,7 +74,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected override void CreateChildControls()
         {
-            this.txtFileName = new SourceControlFileFolderPicker { DisplayMode = SourceControlBrowser.DisplayModes.FoldersAndFiles, ServerId = this.ServerId, Required = true };
+            this.txtFileName = new FileBrowserTextBox { IncludeFiles = true, ServerId = this.ServerId, Required = true };
 
             this.txtId = new ValidatingTextBox { Required = true };
             this.txtVersion = new ValidatingTextBox { Required = true };
