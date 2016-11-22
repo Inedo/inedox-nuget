@@ -11,44 +11,47 @@ using Inedo.IO;
 namespace Inedo.BuildMasterExtensions.NuGet.Operations
 {
     [ScriptAlias("Install-Packages")]
-    [ScriptNamespace("NuGet")]
     [DisplayName("Install NuGet Packages")]
     [Description("Installs all packages required for projects in a solution to build.")]
     public sealed class InstallPackagesOperation : NuGetOperationBase
     {
+        [ScriptAlias("OutputDirectory")]
         [DisplayName("Output directory")]
         [Description("The directory into which packages will be installed.")]
-        [ScriptAlias("OutputDirectory")]
         [DefaultValue("packages")]
         public string PackageOutputDirectory { get; set; }
+        [ScriptAlias("SourceDirectory")]
         [DisplayName("Source directory")]
         [Description("The working directory to use when installing packages.")]
-        [ScriptAlias("SourceDirectory")]
+        [PlaceholderText("$WorkingDirectory")]
         public string SourceDirectory { get; set; }
-        [DisplayName("Source URL")]
-        [Description("The NuGet package source URL. If not specified, the default source will be used for the current server.")]
         [ScriptAlias("Source")]
+        [DisplayName("Source URL")]
+        [PlaceholderText("Use default URL specified in nuget.config")]
         public string ServerUrl { get; set; }
 
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
-            var fileOps = context.Agent.GetService<IFileOperationsExecuter>();
-            var nugetExe = this.GetNuGetExePath(context);
+            var fileOps = await context.Agent.GetServiceAsync<IFileOperationsExecuter>().ConfigureAwait(false);
+            var nugetExe = await this.GetNuGetExePathAsync(context).ConfigureAwait(false);
             if (string.IsNullOrEmpty(nugetExe))
+            {
+                this.LogError("nuget.exe path was empty.");
                 return;
+            }
 
             var sourceDirectory = context.ResolvePath(this.SourceDirectory);
             var outputDirectory = context.ResolvePath(PathEx.Combine(this.SourceDirectory, this.PackageOutputDirectory));
 
             this.LogInformation($"Installing packages for projects in {sourceDirectory} to {outputDirectory}...");
 
-            if (!fileOps.DirectoryExists(sourceDirectory))
+            if (!await fileOps.DirectoryExistsAsync(sourceDirectory).ConfigureAwait(false))
             {
                 this.LogWarning(sourceDirectory + " does not exist.");
                 return;
             }
 
-            fileOps.CreateDirectory(outputDirectory);
+            await fileOps.CreateDirectoryAsync(outputDirectory).ConfigureAwait(false);
 
             this.LogInformation($"Finding packages.config files in {sourceDirectory}...");
 
@@ -67,7 +70,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
             foreach (var configFile in configFiles)
             {
                 this.LogInformation($"Installing packages for {configFile.FullName}...");
-                await this.ExecuteNuGet(context, nugetExe, configFile.FullName, outputDirectory);
+                await this.ExecuteNuGetAsync(context, nugetExe, configFile.FullName, outputDirectory).ConfigureAwait(false);
             }
 
             this.LogInformation("Done installing packages!");
@@ -87,7 +90,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
             );
         }
 
-        private Task ExecuteNuGet(IOperationExecutionContext context, string nugetExe, string packagesConfig, string outputDirectory)
+        private Task ExecuteNuGetAsync(IOperationExecutionContext context, string nugetExe, string packagesConfig, string outputDirectory)
         {
             var args = $"install \"{packagesConfig}\" -OutputDirectory \"{outputDirectory}\"";
             if (!string.IsNullOrWhiteSpace(this.ServerUrl))

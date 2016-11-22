@@ -15,23 +15,25 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         {
         }
 
+        [Category("Advanced")]
         [ScriptAlias("NuGetExePath")]
         [DefaultValue("$NuGetExePath")]
         [DisplayName("NuGet.exe path")]
         [Description("Full path to NuGet.exe on the target server. When not set, the bundled NuGet.exe will be used.")]
         public string NuGetExePath { get; set; }
+        [Category("Advanced")]
         [ScriptAlias("Arguments")]
         [DisplayName("Additional arguments")]
         [Description("When specified, these arguments will be passed to NuGet.exe verbatim.")]
         public string AdditionalArguments { get; set; }
 
-        protected string GetNuGetExePath(IOperationExecutionContext context)
+        protected async Task<string> GetNuGetExePathAsync(IOperationExecutionContext context)
         {
             if (!string.IsNullOrEmpty(this.NuGetExePath))
                 return context.ResolvePath(this.NuGetExePath);
 
-            var executer = context.Agent.GetService<IRemoteMethodExecuter>();
-            string assemblyDir = executer.InvokeFunc(GetNugetExeDirectory);
+            var executer = await context.Agent.GetServiceAsync<IRemoteMethodExecuter>().ConfigureAwait(false);
+            string assemblyDir = await executer.InvokeFuncAsync(GetNugetExeDirectory).ConfigureAwait(false);
 
             return PathEx.Combine(assemblyDir, "nuget.exe");
         }

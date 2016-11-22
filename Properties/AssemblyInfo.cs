@@ -14,3 +14,5 @@ using Inedo.BuildMaster.Extensibility;
 [assembly: AssemblyFileVersion("0.0")]
 [assembly: CLSCompliant(false)]
 [assembly: RequiredBuildMasterVersion("3.0.0")]
+
+[assembly: ScriptNamespace("NuGet")]

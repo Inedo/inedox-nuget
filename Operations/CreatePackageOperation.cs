@@ -12,7 +12,6 @@ using Inedo.Documentation;
 namespace Inedo.BuildMasterExtensions.NuGet.Operations
 {
     [ScriptAlias("Create-Package")]
-    [ScriptNamespace("NuGet")]
     [DisplayName("Create NuGet Package")]
     [Description("Creates a package using NuGet.")]
     [DefaultProperty(nameof(ProjectPath))]
@@ -23,6 +22,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [DisplayName("Source file")]
         [Description("The .nuspec or msbuild project that will be passed to NuGet.exe.")]
         public string ProjectPath { get; set; }
+        [Category("Advanced")]
         [ScriptAlias("Verbose")]
         [Description(CommonDescriptions.VerboseLogging)]
         public bool Verbose { get; set; }
@@ -43,7 +43,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         public bool IncludeReferencedProjects { get; set; }
         [ScriptAlias("OutputDirectory")]
         [Description("The output directory that will be passed to NuGet.exe.")]
-        public string TargetDirectory { get; set; }
+        public string OutputDirectory { get; set; }
         [DisplayName("Source directory")]
         [Description("The working directory to use when executing NuGet.")]
         [ScriptAlias("SourceDirectory")]
@@ -51,16 +51,19 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
-            var fileOps = context.Agent.GetService<IFileOperationsExecuter>();
-            var nugetExe = this.GetNuGetExePath(context);
+            var fileOps = await context.Agent.GetServiceAsync<IFileOperationsExecuter>().ConfigureAwait(false);
+            var nugetExe = await this.GetNuGetExePathAsync(context).ConfigureAwait(false);
             if (string.IsNullOrEmpty(nugetExe))
+            {
+                this.LogError("nuget.exe path was empty.");
                 return;
+            }
 
-            var sourceDirectory = context.ResolvePath(this.SourceDirectory ?? string.Empty);
-            var outputDirectory = context.ResolvePath(this.TargetDirectory, this.SourceDirectory);
+            var sourceDirectory = context.ResolvePath(this.SourceDirectory);
+            var outputDirectory = context.ResolvePath(this.OutputDirectory, this.SourceDirectory);
             var fullProjectPath = context.ResolvePath(this.ProjectPath, this.SourceDirectory);
 
-            if (!fileOps.FileExists(fullProjectPath))
+            if (!await fileOps.FileExistsAsync(fullProjectPath).ConfigureAwait(false))
             {
                 this.LogError(fullProjectPath + " does not exist.");
                 return;
@@ -69,7 +72,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
             fileOps.CreateDirectory(outputDirectory);
 
             this.LogInformation($"Creating NuGet package from {fullProjectPath} to {outputDirectory}...");
-            await this.ExecuteNuGet(context, nugetExe, fullProjectPath, sourceDirectory, outputDirectory);
+            await this.ExecuteNuGet(context, nugetExe, fullProjectPath, sourceDirectory, outputDirectory).ConfigureAwait(false);
         }
 
         protected override ExtendedRichDescription GetDescription(IOperationConfiguration config)
@@ -81,7 +84,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                 ),
                 new RichDescription(
                     "in ",
-                    new DirectoryHilite(config[nameof(this.TargetDirectory)])
+                    new DirectoryHilite(config[nameof(this.OutputDirectory)])
                 )
             );
         }

@@ -15,7 +15,6 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 {
     [Serializable]
     [ScriptAlias("Publish-Package")]
-    [ScriptNamespace("NuGet")]
     [DisplayName("Publish NuGet Package")]
     [Description("Publishes a package to a NuGet feed.")]
     [DefaultProperty(nameof(PackagePath))]
@@ -38,11 +37,9 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         public string ApiKey { get; set; }
         [ScriptAlias("UserName")]
         [DisplayName("User name")]
-        [Description("The user name used to connect to the NuGet feed when authorization is required.")]
         public string UserName { get; set; }
         [ScriptAlias("Password")]
         [DisplayName("Password")]
-        [Description("The password used to connect to the NuGet feed when authorization is required.")]
         public string Password { get; set; }
 
         protected override async Task<object> RemoteExecuteAsync(IRemoteOperationExecutionContext context)

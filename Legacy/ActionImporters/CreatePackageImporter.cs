@@ -19,7 +19,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Legacy.ActionImporters
             return new CreatePackageOperation
             {
                 SourceDirectory = AH.NullIf(context.ConvertLegacyExpression(action.OverriddenSourceDirectory), string.Empty),
-                TargetDirectory = AH.NullIf(context.ConvertLegacyExpression(action.OverriddenTargetDirectory), string.Empty),
+                OutputDirectory = AH.NullIf(context.ConvertLegacyExpression(action.OverriddenTargetDirectory), string.Empty),
                 Build = action.Build,
                 IncludeReferencedProjects = action.IncludeReferencedProjects,
                 ProjectPath = context.ConvertLegacyExpression(action.ProjectPath),
