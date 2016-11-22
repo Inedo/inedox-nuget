@@ -13,7 +13,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 {
     internal sealed class SetDependencyVersionsActionEditor : ActionEditorBase
     {
-        private SourceControlFileFolderPicker txtNuspecFile;
+        private FileBrowserTextBox txtNuspecFile;
         private ValidatingTextBox txtVersions;
 
         public SetDependencyVersionsActionEditor()
@@ -39,10 +39,10 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected override void CreateChildControls()
         {
-            this.txtNuspecFile = new SourceControlFileFolderPicker
+            this.txtNuspecFile = new FileBrowserTextBox
             {
                 ServerId = this.ServerId,
-                DisplayMode = SourceControlBrowser.DisplayModes.FoldersAndFiles,
+                IncludeFiles = true,
                 Required = true
             };
 

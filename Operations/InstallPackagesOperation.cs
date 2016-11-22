@@ -41,7 +41,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
             }
 
             var sourceDirectory = context.ResolvePath(this.SourceDirectory);
-            var outputDirectory = context.ResolvePath(PathEx.Combine(this.SourceDirectory, this.PackageOutputDirectory));
+            var outputDirectory = context.ResolvePath(PathEx.Combine(sourceDirectory, this.PackageOutputDirectory));
 
             this.LogInformation($"Installing packages for projects in {sourceDirectory} to {outputDirectory}...");
 
