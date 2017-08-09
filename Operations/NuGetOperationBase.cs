@@ -37,21 +37,31 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 
             return PathEx.Combine(assemblyDir, "nuget.exe");
         }
-        protected Task ExecuteNuGetAsync(IOperationExecutionContext context, string nugetExe, string args)
+        protected async Task ExecuteNuGetAsync(IOperationExecutionContext context, string nugetExe, string args)
         {
             if (!string.IsNullOrWhiteSpace(this.AdditionalArguments))
                 args += " " + this.AdditionalArguments;
 
             this.LogDebug("Executing: " + nugetExe + " " + args);
 
-            return this.ExecuteCommandLineAsync(
+            int exitCode = await this.ExecuteCommandLineAsync(
                 context,
                 new RemoteProcessStartInfo
                 {
                     FileName = nugetExe,
                     Arguments = args
                 }
-            );
+            ).ConfigureAwait(false);
+
+            if (exitCode != 0)
+                this.LogError($"NuGet.exe exited with code {exitCode}");
+        }
+        protected override void LogProcessOutput(string text)
+        {
+            if (text.Contains("Unable to find version ") || text.StartsWith("WARNING: "))
+                this.LogWarning(text);
+            else
+                base.LogProcessOutput(text);
         }
 
         private static string GetNugetExeDirectory()
