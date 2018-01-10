@@ -47,6 +47,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [DisplayName("Source directory")]
         [Description("The working directory to use when executing NuGet.")]
         [ScriptAlias("SourceDirectory")]
+        [DefaultValue("$WorkingDirectory")]
         public string SourceDirectory { get; set; }
 
         public override async Task ExecuteAsync(IOperationExecutionContext context)
@@ -94,8 +95,8 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
             var argList = new List<string>();
 
             argList.Add("\"" + projectPath + "\"");
-            argList.Add("-BasePath \"" + sourceDirectory + "\"");
-            argList.Add("-OutputDirectory \"" + outputDirectory + "\"");
+            argList.Add("-BasePath \"" + TrimDirectorySeparator(sourceDirectory) + "\"");
+            argList.Add("-OutputDirectory \"" + TrimDirectorySeparator(outputDirectory) + "\"");
 
             bool isNuspec = projectPath.EndsWith(".nuspec", StringComparison.OrdinalIgnoreCase);
             var properties = this.Properties?.ToList();
@@ -114,6 +115,16 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
                 argList.Add("-Properties \"" + string.Join(";", properties) + "\"");
 
             return this.ExecuteNuGetAsync(context, nugetExe, "pack " + string.Join(" ", argList));
+        }
+
+        private static string TrimDirectorySeparator(string d)
+        {
+            if (string.IsNullOrEmpty(d))
+                return d;
+            if (d.Length == 1)
+                return d;
+
+            return d.TrimEnd('\\', '/');
         }
     }
 }
