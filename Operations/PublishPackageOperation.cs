@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Inedo.BuildMaster.Extensibility;
+using Inedo.BuildMaster.Extensibility.Credentials;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
@@ -18,7 +19,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
     [DisplayName("Publish NuGet Package")]
     [Description("Publishes a package to a NuGet feed.")]
     [DefaultProperty(nameof(PackagePath))]
-    public sealed class PublishPackageOperation : RemoteExecuteOperation
+    public sealed class PublishPackageOperation : RemoteExecuteOperation, IHasCredentials<UsernamePasswordCredentials>
     {
         [Required]
         [ScriptAlias("Package")]
@@ -31,15 +32,26 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [Description("The NuGet feed source URL to push the package to.")]
         public string ServerUrl { get; set; }
 
+        [Category("Authentication")]
+        [ScriptAlias("Credentials")]
+        [DisplayName("Credentials")]
+        public string CredentialName { get; set; }
+        [Category("Authentication")]
         [ScriptAlias("ApiKey")]
         [DisplayName("API key")]
         [Description("The NuGet API key required to push packages to the feed.")]
         public string ApiKey { get; set; }
+        [Category("Authentication")]
         [ScriptAlias("UserName")]
         [DisplayName("User name")]
+        [MappedCredential(nameof(UsernamePasswordCredentials.UserName))]
+        [PlaceholderText("Use username from credentials")]
         public string UserName { get; set; }
+        [Category("Authentication")]
         [ScriptAlias("Password")]
         [DisplayName("Password")]
+        [MappedCredential(nameof(UsernamePasswordCredentials.Password))]
+        [PlaceholderText("Use password from credentials")]
         public string Password { get; set; }
 
         protected override async Task<object> RemoteExecuteAsync(IRemoteOperationExecutionContext context)

@@ -20,14 +20,14 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [Required]
         [ScriptAlias("SourceFile")]
         [DisplayName("Source file")]
-        [Description("The .nuspec or msbuild project that will be passed to NuGet.exe.")]
+        [Description("The .nuspec or MSBuild project that will be passed to NuGet.exe.")]
         public string ProjectPath { get; set; }
         [Category("Advanced")]
         [ScriptAlias("Verbose")]
         [Description(CommonDescriptions.VerboseLogging)]
         public bool Verbose { get; set; }
         [ScriptAlias("Version")]
-        [Description("The package version that will be passed ot NuGet.exe.")]
+        [Description("The package version that will be passed to NuGet.exe.")]
         public string Version { get; set; }
         [ScriptAlias("Symbols")]
         [Description("When true, the -Symbols argument will be passed to NuGet.exe.")]
@@ -35,13 +35,18 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         [ScriptAlias("Build")]
         [Description("When true, the -Build argument will be passed to NuGet.exe.")]
         public bool Build { get; set; }
+
+        [Category("Advanced")]
         [ScriptAlias("Properties")]
         [Description("When Build is true, these values will be passed to NuGet.exe as MSBuild properties in the format PROP=VALUE.")]
         public IEnumerable<string> Properties { get; set; }
+        [Category("Advanced")]
         [ScriptAlias("IncludeReferencedProjects")]
+        [DisplayName("Include ref. projects")]
         [Description("When true, the -IncludeReferencedProjects argument will be passed to NuGet.exe.")]
         public bool IncludeReferencedProjects { get; set; }
         [ScriptAlias("OutputDirectory")]
+        [DisplayName("Output directory")]
         [Description("The output directory that will be passed to NuGet.exe.")]
         public string OutputDirectory { get; set; }
         [DisplayName("Source directory")]
