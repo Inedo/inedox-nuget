@@ -68,5 +68,15 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         {
             return PathEx.GetDirectoryName(typeof(NuGetOperationBase).Assembly.Location);
         }
+
+        protected static string TrimDirectorySeparator(string d)
+        {
+            if (string.IsNullOrEmpty(d))
+                return d;
+            if (d.Length == 1)
+                return d;
+
+            return d.TrimEnd('\\', '/');
+        }
     }
 }

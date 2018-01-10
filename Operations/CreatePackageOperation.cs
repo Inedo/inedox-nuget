@@ -121,15 +121,5 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
 
             return this.ExecuteNuGetAsync(context, nugetExe, "pack " + string.Join(" ", argList));
         }
-
-        private static string TrimDirectorySeparator(string d)
-        {
-            if (string.IsNullOrEmpty(d))
-                return d;
-            if (d.Length == 1)
-                return d;
-
-            return d.TrimEnd('\\', '/');
-        }
     }
 }

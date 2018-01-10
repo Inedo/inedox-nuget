@@ -110,6 +110,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Operations\CreatePackageOperation.cs" />
+    <Compile Include="Operations\RestorePackagesOperation.cs" />
     <Compile Include="Operations\InstallPackagesOperation.cs" />
     <Compile Include="Operations\NuGetOperationBase.cs" />
     <Compile Include="Operations\PublishPackageOperation.cs" />
