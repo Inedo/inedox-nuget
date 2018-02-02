@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.VariableFunctions;
+using Inedo.Extensibility;
+using Inedo.Extensibility.VariableFunctions;
 using Inedo.Documentation;
 
 namespace Inedo.BuildMasterExtensions.NuGet.Functions
@@ -11,7 +11,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Functions
     [Tag("nuget")]
     public sealed class NuGetExePathVariableFunction : ScalarVariableFunction
     {
-        protected override object EvaluateScalar(IGenericBuildMasterContext context)
+        protected override object EvaluateScalar(IVariableFunctionContext context)
         {
             return string.Empty;
         }

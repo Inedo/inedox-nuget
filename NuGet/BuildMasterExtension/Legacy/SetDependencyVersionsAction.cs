@@ -14,7 +14,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [Tag("nuget")]
     [DisplayName("Set Nuspec Dependency Versions")]
     [Description("Sets versions required for specific dependencies in a .nuspec file.")]
-    [CustomEditor(typeof(SetDependencyVersionsActionEditor))]
+    [Inedo.Web.CustomEditor(typeof(SetDependencyVersionsActionEditor))]
     public sealed class SetDependencyVersionsAction : AgentBasedActionBase
     {
         [Persistent]

@@ -4,8 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Inedo.Agents;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Operations;
+using Inedo.Extensibility;
+using Inedo.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
 
@@ -24,7 +24,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.Operations
         public string ProjectPath { get; set; }
         [Category("Advanced")]
         [ScriptAlias("Verbose")]
-        [Description(CommonDescriptions.VerboseLogging)]
+        [DisplayName("Verbose logging")]
         public bool Verbose { get; set; }
         [ScriptAlias("Version")]
         [Description("The package version that will be passed to NuGet.exe.")]

@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Web.UI.WebControls;
 using Inedo.BuildMaster.Extensibility.Actions;
-using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
+using Inedo.Web;
 using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.NuGet
@@ -74,7 +74,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected override void CreateChildControls()
         {
-            this.txtFileName = new FileBrowserTextBox { IncludeFiles = true, ServerId = this.ServerId, Required = true };
+            this.txtFileName = new Inedo.Web.FileBrowserTextBox { IncludeFiles = true, ServerId = this.ServerId, Required = true };
 
             this.txtId = new ValidatingTextBox { Required = true };
             this.txtVersion = new ValidatingTextBox { Required = true };

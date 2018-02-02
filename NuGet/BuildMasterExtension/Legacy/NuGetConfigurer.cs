@@ -8,7 +8,7 @@ using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet
 {
-    [CustomEditor(typeof(NuGetConfigurerEditor))]
+    [Inedo.Web.CustomEditor(typeof(NuGetConfigurerEditor))]
     public sealed class NuGetConfigurer : ExtensionConfigurerBase
     {
         [Persistent]

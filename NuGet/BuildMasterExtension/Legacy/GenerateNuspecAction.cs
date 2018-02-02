@@ -14,7 +14,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [Tag("nuget")]
     [DisplayName("Generate .nuspec File")]
     [Description("Writes a new NuGet .nuspec file suitable for use in creating a package.")]
-    [CustomEditor(typeof(GenerateNuspecActionEditor))]
+    [Inedo.Web.CustomEditor(typeof(GenerateNuspecActionEditor))]
     public sealed class GenerateNuspecAction : AgentBasedActionBase
     {
         private const string NuspecSchema = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";

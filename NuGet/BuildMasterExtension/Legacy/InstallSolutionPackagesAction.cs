@@ -16,7 +16,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [Tag("nuget")]
     [DisplayName("Install NuGet Packages")]
     [Description("Installs all packages required for projects in a solution to build.")]
-    [CustomEditor(typeof(InstallSolutionPackagesActionEditor))]
+    [Inedo.Web.CustomEditor(typeof(InstallSolutionPackagesActionEditor))]
     [ConvertibleToOperation(typeof(InstallPackagesImporter))]
     public sealed class InstallSolutionPackagesAction : NuGetActionBase
     {

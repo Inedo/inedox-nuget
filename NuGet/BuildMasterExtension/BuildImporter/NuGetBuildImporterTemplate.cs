@@ -5,7 +5,7 @@ using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
 {
-    [CustomEditor(typeof(NuGetBuildImporterTemplateEditor))]
+    [Inedo.Web.CustomEditor(typeof(NuGetBuildImporterTemplateEditor))]
     internal sealed class NuGetBuildImporterTemplate : BuildImporterTemplateBase<NuGetBuildImporter>
     {
         [Persistent]

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Web.UI.WebControls;
 using Inedo.BuildMaster.Extensibility.Actions;
-using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
 using Inedo.IO;
+using Inedo.Web;
 using Inedo.Web.Controls;
 using Inedo.Web.Controls.SimpleHtml;
 
@@ -69,13 +69,13 @@ namespace Inedo.BuildMasterExtensions.NuGet
             this.ddlSourceType.Items.Add(new ListItem(".nuspec file", "nuspec"));
             this.ddlSourceType.Items.Add(new ListItem("msbuild project", "msbuild"));
 
-            this.txtNuspecPath = new FileBrowserTextBox
+            this.txtNuspecPath = new Inedo.Web.FileBrowserTextBox
             {
                 IncludeFiles = true,
                 ServerId = this.ServerId
             };
 
-            this.txtProjectPath = new FileBrowserTextBox
+            this.txtProjectPath = new Inedo.Web.FileBrowserTextBox
             {
                 IncludeFiles = true,
                 ServerId = this.ServerId

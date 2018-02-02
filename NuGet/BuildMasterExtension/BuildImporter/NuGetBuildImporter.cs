@@ -21,7 +21,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
     [DisplayName("NuGet")]
     [Description("Imports a NuGet package as a BuildMaster artifact.")]
     [BuildImporterTemplate(typeof(NuGetBuildImporterTemplate))]
-    [CustomEditor(typeof(NuGetBuildImporterEditor))]
+    [Inedo.Web.CustomEditor(typeof(NuGetBuildImporterEditor))]
     public sealed class NuGetBuildImporter : BuildImporterBase
     {
         [Persistent]
@@ -78,7 +78,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 if (!string.IsNullOrWhiteSpace(this.AdditionalArguments))
                     args += " " + this.AdditionalArguments;
 
-                this.LogDebug("Executing {0} {1}", nugetExe, args);
+                this.LogDebug($"Executing {nugetExe} {args}");
                 this.LogInformation("Executing NuGet...");
 
                 using (var process = new LocalProcess(new RemoteProcessStartInfo { FileName = nugetExe, Arguments = args }))
@@ -90,7 +90,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
 
                     if (process.ExitCode != 0)
                     {
-                        this.LogError("NuGet failed with exit code {0}.", process.ExitCode);
+                        this.LogError($"NuGet failed with exit code {process.ExitCode}.");
                         return;
                     }
                 }
@@ -105,7 +105,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                     try
                     {
                         var nupkgPath = Path.Combine(packageRootPath, this.PackageId + ".nupkg");
-                        this.LogDebug("Attempting to gather metadata from {0}...", nupkgPath);
+                        this.LogDebug($"Attempting to gather metadata from {nupkgPath}...");
                         var nuspec = NuGetPackage.ReadFromNupkgFile(nupkgPath);
 
                         var packageId = nuspec.Id;
@@ -131,7 +131,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                 }
 
                 var rootCapturePath = Path.Combine(packageRootPath, (this.PackageArtifactRoot ?? string.Empty).Replace('/', '\\').TrimStart('/', '\\'));
-                this.LogDebug("Capturing files in {0}...", rootCapturePath);
+                this.LogDebug($"Capturing files in {rootCapturePath}...");
 
                 var rootEntry = Util.Files.GetDirectoryEntry(
                     new GetDirectoryEntryCommand
@@ -148,7 +148,7 @@ namespace Inedo.BuildMasterExtensions.NuGet.BuildImporter
                     var matches = Util.Files.Comparison.GetMatches(rootCapturePath, rootEntry, new[] { "!\\" + this.PackageId + ".nupkg", "*" });
                     var artifactId = new ArtifactIdentifier(context.ApplicationId, context.ReleaseNumber, context.BuildNumber, context.DeployableId, artifactName);
 
-                    this.LogInformation("Creating artifact {0}...", artifactName);
+                    this.LogInformation($"Creating artifact {artifactName}...");
                     using (var artifact = new ArtifactBuilder(artifactId))
                     {
                         artifact.RootPath = rootCapturePath;

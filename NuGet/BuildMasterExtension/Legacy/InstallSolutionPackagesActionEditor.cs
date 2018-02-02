@@ -7,7 +7,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 {
     internal sealed class InstallSolutionPackagesActionEditor : ActionEditorBase
     {
-        private FileBrowserTextBox txtInstallPath;
+        private Inedo.Web.FileBrowserTextBox txtInstallPath;
 
         public override bool DisplaySourceDirectory => true;
         public override string SourceDirectoryLabel => "For projects in:";
@@ -27,7 +27,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected override void CreateChildControls()
         {
-            this.txtInstallPath = new FileBrowserTextBox
+            this.txtInstallPath = new Inedo.Web.FileBrowserTextBox
             {
                 ServerId = this.ServerId,
                 DefaultText = "$CurrentDirectory\\packages",

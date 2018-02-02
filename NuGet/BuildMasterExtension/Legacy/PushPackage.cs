@@ -11,7 +11,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [Tag("nuget")]
     [DisplayName("Publish NuGet Package")]
     [Description("Publishes a package using NuGet.")]
-    [CustomEditor(typeof(PushPackageActionEditor))]
+    [Inedo.Web.CustomEditor(typeof(PushPackageActionEditor))]
     [ConvertibleToOperation(typeof(PushPackageImporter))]
     public sealed class PushPackage : NuGetActionBase
     {

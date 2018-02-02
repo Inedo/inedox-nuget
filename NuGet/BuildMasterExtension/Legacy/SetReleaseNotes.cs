@@ -17,7 +17,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
     [Tag("nuget")]
     [DisplayName("Set Release Notes")]
     [Description("Writes release notes to a .nuspec file using BuildMaster's release notes or the application's issue tracker.")]
-    [CustomEditor(typeof(SetReleaseNotesActionEditor))]
+    [Inedo.Web.CustomEditor(typeof(SetReleaseNotesActionEditor))]
     public sealed class SetReleaseNotes : RemoteActionBase
     {
         [Persistent]

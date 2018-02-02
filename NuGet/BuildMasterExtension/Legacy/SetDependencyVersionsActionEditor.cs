@@ -13,7 +13,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 {
     internal sealed class SetDependencyVersionsActionEditor : ActionEditorBase
     {
-        private FileBrowserTextBox txtNuspecFile;
+        private Inedo.Web.FileBrowserTextBox txtNuspecFile;
         private ValidatingTextBox txtVersions;
 
         public SetDependencyVersionsActionEditor()
@@ -39,7 +39,7 @@ namespace Inedo.BuildMasterExtensions.NuGet
 
         protected override void CreateChildControls()
         {
-            this.txtNuspecFile = new FileBrowserTextBox
+            this.txtNuspecFile = new Inedo.Web.FileBrowserTextBox
             {
                 ServerId = this.ServerId,
                 IncludeFiles = true,

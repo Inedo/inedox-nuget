@@ -2,9 +2,10 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Inedo.BuildMaster.Extensibility;
+using Inedo.Extensibility;
 
 [assembly: AssemblyTitle("NuGet")]
-[assembly: AssemblyDescription("Contains actions and a build importer for working with NuGet servers.")]
+[assembly: AssemblyDescription("Contains operations, actions, and a build importer for working with NuGet servers.")]
 
 [assembly: ComVisible(false)]
 [assembly: AssemblyCompany("Inedo, LLC")]

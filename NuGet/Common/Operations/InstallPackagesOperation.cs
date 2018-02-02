@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Inedo.Agents;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Operations;
+using Inedo.Extensibility;
+using Inedo.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.IO;
