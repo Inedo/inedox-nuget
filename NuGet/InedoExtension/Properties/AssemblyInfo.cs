@@ -4,11 +4,9 @@ using Inedo.Extensibility;
 
 [assembly: AssemblyTitle("NuGet")]
 [assembly: AssemblyDescription("Contains operations for working with NuGet.")]
-
-[assembly: ComVisible(false)]
 [assembly: AssemblyCompany("Inedo, LLC")]
-[assembly: AssemblyCopyright("Copyright © 2008 - 2018")]
-[assembly: AssemblyVersion("0.0.0.0")]
-[assembly: AssemblyFileVersion("0.0")]
-
+[assembly: AssemblyCopyright("Copyright © Inedo 2018")]
+[assembly: AssemblyVersion("1.0.1")]
+[assembly: AssemblyFileVersion("1.0.1")]
+[assembly: ComVisible(false)]
 [assembly: ScriptNamespace("NuGet")]
