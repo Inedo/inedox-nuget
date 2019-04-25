@@ -15,6 +15,7 @@ namespace Inedo.Extensions.NuGet.Operations
     [DisplayName("Create NuGet Package")]
     [Description("Creates a package using NuGet.")]
     [DefaultProperty(nameof(ProjectPath))]
+    [Tag("nuget")]
     public sealed class CreatePackageOperation : NuGetOperationBase
     {
         [Required]

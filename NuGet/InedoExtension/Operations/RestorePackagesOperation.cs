@@ -12,6 +12,7 @@ namespace Inedo.Extensions.NuGet.Operations
     [ScriptAlias("Restore-Packages")]
     [DisplayName("Restore NuGet Packages")]
     [Description("Restores all packages in a specified solution, project, or packages.config file.")]
+    [Tag("nuget")]
     public sealed class RestorePackagesOperation : NuGetOperationBase
     {
         [ScriptAlias("Target")]

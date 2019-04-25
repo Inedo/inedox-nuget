@@ -13,6 +13,7 @@ namespace Inedo.Extensions.NuGet.Operations
     [ScriptAlias("Install-Packages")]
     [DisplayName("Install NuGet Packages")]
     [Description("Installs all packages required for projects in a solution to build.")]
+    [Tag("nuget")]
     public sealed class InstallPackagesOperation : NuGetOperationBase
     {
         [ScriptAlias("OutputDirectory")]

@@ -19,6 +19,7 @@ namespace Inedo.Extensions.NuGet.Operations
     [DisplayName("Publish NuGet Package")]
     [Description("Publishes a package to a NuGet feed.")]
     [DefaultProperty(nameof(PackagePath))]
+    [Tag("nuget")]
     public sealed class PublishPackageOperation : RemoteExecuteOperation, IHasCredentials<UsernamePasswordCredentials>
     {
         [Required]
