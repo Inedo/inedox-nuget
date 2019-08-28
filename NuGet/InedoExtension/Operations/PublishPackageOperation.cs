@@ -11,6 +11,11 @@ using Inedo.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.IO;
+using System.IO.Compression;
+using System.Text.RegularExpressions;
+using System.Linq;
+using Inedo.ExecutionEngine.Executer;
+using System.Xml.Linq;
 
 namespace Inedo.Extensions.NuGet.Operations
 {
@@ -22,6 +27,9 @@ namespace Inedo.Extensions.NuGet.Operations
     [Tag("nuget")]
     public sealed class PublishPackageOperation : RemoteExecuteOperation, IHasCredentials<UsernamePasswordCredentials>
     {
+        [NonSerialized]
+        private IPackageManager packageManager;
+
         [Required]
         [ScriptAlias("Package")]
         [DisplayName("Package file name")]
@@ -55,6 +63,22 @@ namespace Inedo.Extensions.NuGet.Operations
         [PlaceholderText("Use password from credentials")]
         public string Password { get; set; }
 
+        [ScriptAlias("Source")]
+        [Category("Advanced")]
+        [DisplayName("Package source")]
+        public string PackageSource { get; set; }
+        [DefaultValue(true)]
+        [ScriptAlias("AttachToBuild")]
+        [Category("Advanced")]
+        [DisplayName("Attach to build")]
+        public bool AttachToBuild { get; set; } = true;
+
+        protected override async Task BeforeRemoteExecuteAsync(IOperationExecutionContext context)
+        {
+            this.packageManager = await context.TryGetServiceAsync<IPackageManager>();
+            await base.BeforeRemoteExecuteAsync(context);
+        }
+
         protected override async Task<object> RemoteExecuteAsync(IRemoteOperationExecutionContext context)
         {
             var packagePath = context.ResolvePath(this.PackagePath);
@@ -66,6 +90,8 @@ namespace Inedo.Extensions.NuGet.Operations
                 this.LogError(packagePath + " does not exist.");
                 return null;
             }
+
+            var packageInfo = PackageInfo.Extract(packagePath);
 
             var handler = new HttpClientHandler { Proxy = WebRequest.DefaultWebProxy };
 
@@ -115,7 +141,23 @@ namespace Inedo.Extensions.NuGet.Operations
                 }
             }
 
-            return null;
+            return packageInfo;
+        }
+
+        protected override async Task AfterRemoteExecuteAsync(object result)
+        {
+            await base.AfterRemoteExecuteAsync(result);
+
+            if (this.AttachToBuild && !string.IsNullOrWhiteSpace(this.PackageSource) && result is PackageInfo info)
+            {
+                if (this.packageManager == null)
+                {
+                    this.LogWarning("Package manager is not available; cannot attach to build.");
+                    return;
+                }
+
+                await this.packageManager.AttachPackageToBuildAsync(new AttachedPackage(AttachedPackageType.NuGet, info.Id, info.Version, info.SHA1, this.PackageSource), default);
+            }
         }
 
         protected override ExtendedRichDescription GetDescription(IOperationConfiguration config)
@@ -130,6 +172,59 @@ namespace Inedo.Extensions.NuGet.Operations
                     new Hilite(config[nameof(this.ServerUrl)])
                 )
             );
+        }
+
+        [Serializable]
+        private sealed class PackageInfo
+        {
+            private static readonly LazyRegex NuspecRegex = new LazyRegex(@"^[^/\\]+\.nuspec$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
+            private PackageInfo(string id, string version, byte[] sha1)
+            {
+                this.Id = id;
+                this.Version = version;
+                this.SHA1 = sha1;
+            }
+
+            public string Id { get; }
+            public string Version { get; }
+            public byte[] SHA1 { get; }
+
+            public static PackageInfo Extract(string packagePath)
+            {
+                using (var fileStream = FileEx.Open(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    byte[] hash;
+                    using (var sha1 = System.Security.Cryptography.SHA1.Create())
+                    {
+                        hash = sha1.ComputeHash(fileStream);
+                    }
+
+                    fileStream.Position = 0;
+
+                    using (var zip = new ZipArchive(fileStream, ZipArchiveMode.Read, true))
+                    {
+                        var nuspecFile = zip.Entries.FirstOrDefault(e => NuspecRegex.IsMatch(e.FullName));
+                        if (nuspecFile == null)
+                            throw new ExecutionFailureException(packagePath + " is not a valid NuGet package; it is missing a .nuspec file.");
+
+                        using (var nuspecStream = nuspecFile.Open())
+                        {
+                            var xdoc = XDocument.Load(nuspecStream);
+                            var ns = xdoc.Root.GetDefaultNamespace();
+                            var id = (string)xdoc.Root.Element(ns + "metadata")?.Element(ns + "id");
+                            if (string.IsNullOrWhiteSpace(id))
+                                throw new ExecutionFailureException(packagePath + " has an invalid .nuspec file; missing \"id\" element.");
+
+                            var version = (string)xdoc.Root.Element(ns + "metadata")?.Element(ns + "version");
+                            if (string.IsNullOrWhiteSpace(version))
+                                throw new ExecutionFailureException(packagePath + " has an invalid .nuspec file; missing \"version\" element.");
+
+                            return new PackageInfo(id, version, hash);
+                        }
+                    }
+                }
+            }
         }
     }
 }
