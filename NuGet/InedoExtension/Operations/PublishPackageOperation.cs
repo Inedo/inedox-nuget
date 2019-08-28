@@ -35,9 +35,8 @@ namespace Inedo.Extensions.NuGet.Operations
         [DisplayName("Package file name")]
         [Description("The path of the .nupkg file to push to the NuGet feed.")]
         public string PackagePath { get; set; }
-        [Required]
         [ScriptAlias("Url")]
-        [DisplayName("Source")]
+        [DisplayName("Source URL")]
         [Description("The NuGet feed source URL to push the package to.")]
         public string ServerUrl { get; set; }
 
@@ -75,8 +74,41 @@ namespace Inedo.Extensions.NuGet.Operations
 
         protected override async Task BeforeRemoteExecuteAsync(IOperationExecutionContext context)
         {
-            this.packageManager = await context.TryGetServiceAsync<IPackageManager>();
             await base.BeforeRemoteExecuteAsync(context);
+            this.packageManager = await context.TryGetServiceAsync<IPackageManager>();
+
+            // if username is not already specified and there is a package source, look up any attached credentials
+            if (string.IsNullOrEmpty(this.UserName) && !string.IsNullOrEmpty(this.PackageSource))
+            {
+                var packageSource = SDK.GetPackageSources()
+                    .FirstOrDefault(s => string.Equals(s.Name, this.PackageSource, StringComparison.OrdinalIgnoreCase));
+
+                if (packageSource == null)
+                    throw new ExecutionFailureException($"Package source \"{this.PackageSource}\" not found.");
+
+                if (!string.IsNullOrEmpty(this.ServerUrl))
+                    this.ServerUrl = packageSource.FeedUrl;
+
+                if (!string.IsNullOrEmpty(packageSource.CredentialName))
+                {
+                    int? applicationId = null;
+                    int? environmentId = null;
+
+                    if (context is IStandardContext standardContext)
+                    {
+                        applicationId = standardContext.ProjectId;
+                        environmentId = standardContext.EnvironmentId;
+                    }
+
+                    var credentials = (UsernamePasswordCredentials)ResourceCredentials.TryCreate("UsernamePassword", packageSource.CredentialName, environmentId, applicationId, false);
+                    if (credentials == null)
+                        throw new ExecutionFailureException($"Credentials ({packageSource.CredentialName}) specified in \"{packageSource.Name}\" package source must be a Username & Password credential.");
+
+                    // assign these values to the operation so they get serialized prior to remote execute
+                    this.UserName = credentials.UserName;
+                    this.Password = AH.Unprotect(credentials.Password);
+                }
+            }
         }
 
         protected override async Task<object> RemoteExecuteAsync(IRemoteOperationExecutionContext context)
@@ -84,6 +116,12 @@ namespace Inedo.Extensions.NuGet.Operations
             var packagePath = context.ResolvePath(this.PackagePath);
 
             this.LogInformation($"Pushing {packagePath} to {this.ServerUrl}...");
+
+            if (string.IsNullOrEmpty(this.ServerUrl))
+            {
+                this.LogError("Missing required property \"Url\".");
+                return null;
+            }
 
             if (!FileEx.Exists(packagePath))
             {
