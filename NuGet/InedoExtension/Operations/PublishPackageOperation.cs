@@ -74,7 +74,6 @@ namespace Inedo.Extensions.NuGet.Operations
 
         protected override async Task BeforeRemoteExecuteAsync(IOperationExecutionContext context)
         {
-            await base.BeforeRemoteExecuteAsync(context);
             this.packageManager = await context.TryGetServiceAsync<IPackageManager>();
 
             // if username is not already specified and there is a package source, look up any attached credentials
@@ -86,7 +85,7 @@ namespace Inedo.Extensions.NuGet.Operations
                 if (packageSource == null)
                     throw new ExecutionFailureException($"Package source \"{this.PackageSource}\" not found.");
 
-                if (!string.IsNullOrEmpty(this.ServerUrl))
+                if (string.IsNullOrEmpty(this.ServerUrl))
                     this.ServerUrl = packageSource.FeedUrl;
 
                 if (!string.IsNullOrEmpty(packageSource.CredentialName))
@@ -109,6 +108,8 @@ namespace Inedo.Extensions.NuGet.Operations
                     this.Password = AH.Unprotect(credentials.Password);
                 }
             }
+
+            await base.BeforeRemoteExecuteAsync(context);
         }
 
         protected override async Task<object> RemoteExecuteAsync(IRemoteOperationExecutionContext context)
