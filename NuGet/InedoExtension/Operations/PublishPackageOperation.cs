@@ -99,13 +99,19 @@ namespace Inedo.Extensions.NuGet.Operations
                         environmentId = standardContext.EnvironmentId;
                     }
 
-                    var credentials = (UsernamePasswordCredentials)ResourceCredentials.TryCreate("UsernamePassword", packageSource.CredentialName, environmentId, applicationId, false);
-                    if (credentials == null)
-                        throw new ExecutionFailureException($"Credentials ({packageSource.CredentialName}) specified in \"{packageSource.Name}\" package source must be a Username & Password credential.");
-
-                    // assign these values to the operation so they get serialized prior to remote execute
-                    this.UserName = credentials.UserName;
-                    this.Password = AH.Unprotect(credentials.Password);
+                    // InedoProduct
+                    if (ResourceCredentials.TryCreate("UsernamePassword", packageSource.CredentialName, environmentId, applicationId, false) is UsernamePasswordCredentials upc)
+                    {
+                        this.UserName = upc.UserName;
+                        this.Password = AH.Unprotect(upc.Password);
+                    }
+                    else if (ResourceCredentials.TryCreate("InedoProduct", packageSource.CredentialName, environmentId, applicationId, false) is InedoProductCredentials ipc)
+                    {
+                        this.UserName = "api";
+                        this.Password = AH.Unprotect(ipc.ApiKey);
+                    }
+                    else 
+                        throw new ExecutionFailureException($"Credentials ({packageSource.CredentialName}) specified in \"{packageSource.Name}\" package source must be an InedoProduct or UsernamePassword credential.");
                 }
             }
 

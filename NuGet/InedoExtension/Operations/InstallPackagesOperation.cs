@@ -7,6 +7,8 @@ using Inedo.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
 using Inedo.IO;
+using Inedo.ExecutionEngine.Executer;
+using System;
 
 namespace Inedo.Extensions.NuGet.Operations
 {
@@ -30,9 +32,28 @@ namespace Inedo.Extensions.NuGet.Operations
         [DisplayName("Source URL")]
         [PlaceholderText("Use default URL specified in nuget.config")]
         public string ServerUrl { get; set; }
+        [ScriptAlias("SourceName")]
+        [Category("Advanced")]
+        [DisplayName("Package source")]
+        public string PackageSource { get; set; }
 
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
+            if (!string.IsNullOrEmpty(this.PackageSource))
+            {
+                if (!string.IsNullOrEmpty(this.ServerUrl))
+                {
+                    this.LogWarning("SourceName will be ignored because Source (url) is specified.");
+                }
+                else
+                {
+                    var packageSource = SDK.GetPackageSources().FirstOrDefault(s => string.Equals(s.Name, this.PackageSource, StringComparison.OrdinalIgnoreCase));
+                    if (packageSource == null)
+                        throw new ExecutionFailureException($"Package source \"{this.PackageSource}\" not found.");
+                    this.ServerUrl = packageSource.FeedUrl;
+                }
+            }
+
             var fileOps = await context.Agent.GetServiceAsync<IFileOperationsExecuter>().ConfigureAwait(false);
             var nugetExe = await this.GetNuGetExePathAsync(context).ConfigureAwait(false);
             if (string.IsNullOrEmpty(nugetExe))

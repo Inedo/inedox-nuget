@@ -11,4 +11,4 @@ using Inedo.Extensibility;
 [assembly: ComVisible(false)]
 [assembly: ScriptNamespace("NuGet")]
 
-[assembly: AppliesTo(InedoProduct.BuildMaster | InedoProduct.Otter | InedoProduct.Hedgehog)]
+[assembly: AppliesTo(InedoProduct.BuildMaster | InedoProduct.Otter)]
