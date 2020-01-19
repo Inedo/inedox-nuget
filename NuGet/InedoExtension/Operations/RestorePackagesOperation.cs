@@ -9,6 +9,8 @@ using Inedo.Documentation;
 using System.Linq;
 using System;
 using Inedo.ExecutionEngine.Executer;
+using Inedo.Extensibility.SecureResources;
+using Inedo.Extensions.SecureResources;
 
 namespace Inedo.Extensions.NuGet.Operations
 {
@@ -48,10 +50,8 @@ namespace Inedo.Extensions.NuGet.Operations
                 }
                 else
                 {
-                    var packageSource = SDK.GetPackageSources().FirstOrDefault(s => string.Equals(s.Name, this.PackageSource, StringComparison.OrdinalIgnoreCase));
-                    if (packageSource == null)
-                        throw new ExecutionFailureException($"Package source \"{this.PackageSource}\" not found.");
-                    this.ServerUrl = packageSource.FeedUrl;
+                    var packageSource = (NuGetPackageSource)SecureResource.Create(this.PackageSource, (IResourceResolutionContext)context);
+                    this.ServerUrl = packageSource.ApiEndpointUrl;
                 }
             }
 
