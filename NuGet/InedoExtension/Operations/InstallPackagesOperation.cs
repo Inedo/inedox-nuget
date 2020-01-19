@@ -49,6 +49,7 @@ namespace Inedo.Extensions.NuGet.Operations
                 }
                 else
                 {
+                    this.LogDebug($"Using package source {this.PackageSource}.");
                     var packageSource = (NuGetPackageSource)SecureResource.Create(this.PackageSource, (IResourceResolutionContext)context);
                     this.ServerUrl = packageSource.ApiEndpointUrl;
                 }

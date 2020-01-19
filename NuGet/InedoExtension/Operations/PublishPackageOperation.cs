@@ -86,6 +86,7 @@ namespace Inedo.Extensions.NuGet.Operations
             // if username is not already specified and there is a package source, look up any attached credentials
             if (string.IsNullOrEmpty(this.UserName) && !string.IsNullOrEmpty(this.PackageSource))
             {
+                this.LogDebug($"Using package source {this.PackageSource}.");
                 var packageSource = (NuGetPackageSource)SecureResource.Create(this.PackageSource, (IResourceResolutionContext)context);
 
                 if (string.IsNullOrEmpty(this.ServerUrl))
@@ -93,6 +94,7 @@ namespace Inedo.Extensions.NuGet.Operations
 
                 if (!string.IsNullOrEmpty(packageSource.CredentialName))
                 {
+                    this.LogDebug($"Using credentials {packageSource.CredentialName}.");
                     var creds = packageSource.GetCredentials((ICredentialResolutionContext)context);
                     if (creds is TokenCredentials tc)
                     {
@@ -175,6 +177,7 @@ namespace Inedo.Extensions.NuGet.Operations
                         {
                             this.LogError($"Server responded with {(int)response.StatusCode}: {response.ReasonPhrase}");
                             this.LogError(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                            return null;
                         }
                     }
                 }
