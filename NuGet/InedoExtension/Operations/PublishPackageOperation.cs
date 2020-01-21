@@ -16,6 +16,10 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Inedo.ExecutionEngine.Executer;
 using System.Xml.Linq;
+using Inedo.Extensions.SecureResources;
+using Inedo.Extensibility.SecureResources;
+using Inedo.Extensions.Credentials;
+using LegacyUsernamePasswordCredentials = Inedo.Extensibility.Credentials.UsernamePasswordCredentials;
 
 namespace Inedo.Extensions.NuGet.Operations
 {
@@ -25,7 +29,10 @@ namespace Inedo.Extensions.NuGet.Operations
     [Description("Publishes a package to a NuGet feed.")]
     [DefaultProperty(nameof(PackagePath))]
     [Tag("nuget")]
-    public sealed class PublishPackageOperation : RemoteExecuteOperation, IHasCredentials<UsernamePasswordCredentials>
+    public sealed class PublishPackageOperation : RemoteExecuteOperation
+#pragma warning disable CS0618 // Type or member is obsolete
+        , IHasCredentials<LegacyUsernamePasswordCredentials>
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         [NonSerialized]
         private IPackageManager packageManager;
@@ -52,13 +59,13 @@ namespace Inedo.Extensions.NuGet.Operations
         [Category("Authentication")]
         [ScriptAlias("UserName")]
         [DisplayName("User name")]
-        [MappedCredential(nameof(UsernamePasswordCredentials.UserName))]
+        [MappedCredential(nameof(LegacyUsernamePasswordCredentials.UserName))]
         [PlaceholderText("Use username from credentials")]
         public string UserName { get; set; }
         [Category("Authentication")]
         [ScriptAlias("Password")]
         [DisplayName("Password")]
-        [MappedCredential(nameof(UsernamePasswordCredentials.Password))]
+        [MappedCredential(nameof(LegacyUsernamePasswordCredentials.Password))]
         [PlaceholderText("Use password from credentials")]
         public string Password { get; set; }
 
@@ -79,39 +86,28 @@ namespace Inedo.Extensions.NuGet.Operations
             // if username is not already specified and there is a package source, look up any attached credentials
             if (string.IsNullOrEmpty(this.UserName) && !string.IsNullOrEmpty(this.PackageSource))
             {
-                var packageSource = SDK.GetPackageSources()
-                    .FirstOrDefault(s => string.Equals(s.Name, this.PackageSource, StringComparison.OrdinalIgnoreCase));
-
-                if (packageSource == null)
-                    throw new ExecutionFailureException($"Package source \"{this.PackageSource}\" not found.");
+                this.LogDebug($"Using package source {this.PackageSource}.");
+                var packageSource = (NuGetPackageSource)SecureResource.Create(this.PackageSource, (IResourceResolutionContext)context);
 
                 if (string.IsNullOrEmpty(this.ServerUrl))
-                    this.ServerUrl = packageSource.FeedUrl;
+                    this.ServerUrl = packageSource.ApiEndpointUrl;
 
                 if (!string.IsNullOrEmpty(packageSource.CredentialName))
                 {
-                    int? applicationId = null;
-                    int? environmentId = null;
-
-                    if (context is IStandardContext standardContext)
+                    this.LogDebug($"Using credentials {packageSource.CredentialName}.");
+                    var creds = packageSource.GetCredentials((ICredentialResolutionContext)context);
+                    if (creds is TokenCredentials tc)
                     {
-                        applicationId = standardContext.ProjectId;
-                        environmentId = standardContext.EnvironmentId;
+                        this.UserName = "api";
+                        this.Password = AH.Unprotect(tc.Token);
                     }
-
-                    // InedoProduct
-                    if (ResourceCredentials.TryCreate("UsernamePassword", packageSource.CredentialName, environmentId, applicationId, false) is UsernamePasswordCredentials upc)
+                    else if (creds is Inedo.Extensions.Credentials.UsernamePasswordCredentials upc)
                     {
                         this.UserName = upc.UserName;
                         this.Password = AH.Unprotect(upc.Password);
                     }
-                    else if (ResourceCredentials.TryCreate("InedoProduct", packageSource.CredentialName, environmentId, applicationId, false) is InedoProductCredentials ipc)
-                    {
-                        this.UserName = "api";
-                        this.Password = AH.Unprotect(ipc.ApiKey);
-                    }
-                    else 
-                        throw new ExecutionFailureException($"Credentials ({packageSource.CredentialName}) specified in \"{packageSource.Name}\" package source must be an InedoProduct or UsernamePassword credential.");
+                    else
+                        throw new InvalidOperationException();
                 }
             }
 
@@ -181,6 +177,7 @@ namespace Inedo.Extensions.NuGet.Operations
                         {
                             this.LogError($"Server responded with {(int)response.StatusCode}: {response.ReasonPhrase}");
                             this.LogError(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                            return null;
                         }
                     }
                 }
