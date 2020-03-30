@@ -1,38 +1,36 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Inedo.Diagnostics;
+using Inedo.Documentation;
+using Inedo.ExecutionEngine.Executer;
 using Inedo.Extensibility;
 using Inedo.Extensibility.Credentials;
 using Inedo.Extensibility.Operations;
-using Inedo.Diagnostics;
-using Inedo.Documentation;
-using Inedo.IO;
-using System.IO.Compression;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Inedo.ExecutionEngine.Executer;
-using System.Xml.Linq;
-using Inedo.Extensions.SecureResources;
 using Inedo.Extensibility.SecureResources;
 using Inedo.Extensions.Credentials;
+using Inedo.Extensions.SecureResources;
+using Inedo.IO;
 using LegacyUsernamePasswordCredentials = Inedo.Extensibility.Credentials.UsernamePasswordCredentials;
 
 namespace Inedo.Extensions.NuGet.Operations
 {
+    [Obsolete]
     [Serializable]
     [ScriptAlias("Publish-Package")]
     [DisplayName("Publish NuGet Package")]
     [Description("Publishes a package to a NuGet feed.")]
     [DefaultProperty(nameof(PackagePath))]
     [Tag("nuget")]
-    public sealed class PublishPackageOperation : RemoteExecuteOperation
-#pragma warning disable CS0618 // Type or member is obsolete
-        , IHasCredentials<LegacyUsernamePasswordCredentials>
-#pragma warning restore CS0618 // Type or member is obsolete
+    public sealed class PublishPackageOperation : RemoteExecuteOperation, IHasCredentials<LegacyUsernamePasswordCredentials>
     {
         [NonSerialized]
         private IPackageManager packageManager;

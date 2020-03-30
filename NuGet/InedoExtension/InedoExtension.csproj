@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Operations\PushPackageOperation.cs" />
     <Compile Include="VariableFunctions\NuGetExePathVariableFunction.cs" />
     <Compile Include="Operations\CreatePackageOperation.cs" />
     <Compile Include="Operations\InstallPackagesOperation.cs" />

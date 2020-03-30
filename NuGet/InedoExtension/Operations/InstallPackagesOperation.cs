@@ -2,15 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Inedo.Agents;
-using Inedo.Extensibility;
-using Inedo.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
-using Inedo.IO;
-using Inedo.ExecutionEngine.Executer;
-using System;
-using Inedo.Extensions.SecureResources;
+using Inedo.Extensibility;
+using Inedo.Extensibility.Operations;
 using Inedo.Extensibility.SecureResources;
+using Inedo.Extensions.SecureResources;
+using Inedo.IO;
 
 namespace Inedo.Extensions.NuGet.Operations
 {
@@ -93,7 +91,7 @@ namespace Inedo.Extensions.NuGet.Operations
             foreach (var configFile in configFiles)
             {
                 this.LogInformation($"Installing packages for {configFile.FullName}...");
-                await this.ExecuteNuGetAsync(context, nugetExe, configFile.FullName, outputDirectory).ConfigureAwait(false);
+                await this.ExecuteInstallNuGetAsync(context, nugetExe, configFile.FullName, outputDirectory).ConfigureAwait(false);
             }
 
             this.LogInformation("Done installing packages!");
@@ -113,7 +111,7 @@ namespace Inedo.Extensions.NuGet.Operations
             );
         }
 
-        private Task ExecuteNuGetAsync(IOperationExecutionContext context, string nugetExe, string packagesConfig, string outputDirectory)
+        private Task ExecuteInstallNuGetAsync(IOperationExecutionContext context, string nugetExe, string packagesConfig, string outputDirectory)
         {
             var args = $"install \"{packagesConfig}\" -OutputDirectory \"{outputDirectory}\"";
             if (!string.IsNullOrWhiteSpace(this.ServerUrl))

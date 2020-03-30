@@ -36,12 +36,16 @@ namespace Inedo.Extensions.NuGet.Operations
 
             return PathEx.Combine(assemblyDir, "nuget.exe");
         }
-        protected async Task ExecuteNuGetAsync(IOperationExecutionContext context, string nugetExe, string args)
+        protected async Task ExecuteNuGetAsync(IOperationExecutionContext context, string nugetExe, string args, string logArgs = null)
         {
             if (!string.IsNullOrWhiteSpace(this.AdditionalArguments))
+            {
                 args += " " + this.AdditionalArguments;
+                if (logArgs != null)
+                    logArgs += this.AdditionalArguments;
+            }
 
-            this.LogDebug("Executing: " + nugetExe + " " + args);
+            this.LogDebug("Executing: " + nugetExe + " " + (logArgs ?? args));
 
             int exitCode = await this.ExecuteCommandLineAsync(
                 context,
