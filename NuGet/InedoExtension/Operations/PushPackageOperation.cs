@@ -66,7 +66,7 @@ namespace Inedo.Extensions.NuGet.Operations
             await this.ExecuteNuGetAsync(
                 context,
                 nugetExe,
-                $"push \"{packagePath}\" -ApiKey \"{AH.Unprotect(tokenCredentials.Token)} -Source \"{packageSource.ApiEndpointUrl}\" -NonInteractive",
+                $"push \"{packagePath}\" -ApiKey \"{AH.Unprotect(tokenCredentials.Token)}\" -Source \"{packageSource.ApiEndpointUrl}\" -NonInteractive",
                 $"push \"{packagePath}\" -ApiKey XXXXX -Source \"{packageSource.ApiEndpointUrl}\" -NonInteractive"
             );
         }
